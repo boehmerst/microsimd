@@ -1,0 +1,112 @@
+-------------------------------------------------------------------------------
+-- Title      : simple single port acknowledge on read fifo
+-- Project    : Digitalis
+-------------------------------------------------------------------------------
+-- File       : sp_fifo.vhd
+-- Author     : s.boehmer@pmdtec.com
+-- Company    : PMDTec
+-- Created    : 2012-04-20
+-- Last update: 2012-04-20
+-- Platform   : Fedora Linux
+-- Standard   : VHDL'93
+-------------------------------------------------------------------------------
+-- Description: simple single port fifo with generic depth and width
+--              rd_i is acting as an read acknowledge
+-------------------------------------------------------------------------------
+-- Copyright (c) 2011 PMDTec
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 2012-04-20  1.0      SBo     Created
+-------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity sp_fifo is
+  generic (
+    data_width_g : positive := 1;
+    log2_depth_g : positive := 2
+  );
+  port (
+    clk_i        : in  std_ulogic;
+    reset_i      : in  std_ulogic;
+    wr_i         : in  std_ulogic;
+    data_i       : in  std_ulogic_vector(data_width_g-1 downto 0);
+    full_o       : out std_ulogic;
+    rd_i         : in  std_ulogic;
+    data_o       : out std_ulogic_vector(data_width_g-1 downto 0);
+    empty_o      : out std_ulogic
+  );
+end entity sp_fifo;
+
+architecture rtl of sp_fifo is
+
+  type buffer_t is array(natural range 0 to 2**log2_depth_g-1) of std_ulogic_vector(data_width_g-1 downto 0);
+
+  type reg_t is record
+    wr_ptr      : unsigned(log2_depth_g-1 downto 0);
+    rd_ptr      : unsigned(log2_depth_g-1 downto 0);
+    data_buffer : buffer_t;
+    empty       : std_ulogic;
+    full        : std_ulogic;
+  end record reg_t;
+  constant dflt_reg_c : reg_t :=(
+    wr_ptr      => (others=>'0'),
+    rd_ptr      => (others=>'0'),
+    data_buffer => (others=>(others=>'0')),
+    empty       => '1',
+    full        => '0'
+  );
+
+  signal r, rin : reg_t;
+
+begin
+  -----------------------------------------------------------------------------
+  -- comb0
+  -----------------------------------------------------------------------------
+  comb0: process(r, wr_i, data_i, rd_i) is
+    variable v : reg_t;
+  begin
+    v := r; 
+
+    if(wr_i = '1') then
+      v.data_buffer(to_integer(v.wr_ptr)) := data_i;
+      v.wr_ptr                            := v.wr_ptr + 1;
+    end if;
+
+    if(rd_i = '1') then
+      v.rd_ptr := v.rd_ptr + 1;
+    end if;
+
+    v.empty   := '0';
+    if(v.wr_ptr = v.rd_ptr) then
+      v.empty := '1';
+    end if;
+
+    v.full   := '0';
+    if(v.wr_ptr+1 = v.rd_ptr) then
+      v.full := '1';
+    end if;
+
+    data_o  <= r.data_buffer(to_integer(r.rd_ptr));
+    empty_o <= r.empty;
+    full_o  <= r.full;
+
+    rin <= v;
+  end process comb0;
+
+  -----------------------------------------------------------------------------
+  -- sync0
+  -----------------------------------------------------------------------------
+  sync0: process(reset_i, clk_i) is
+  begin
+    if(reset_i = '1') then
+      r <= dflt_reg_c;
+    elsif(rising_edge(clk_i)) then
+      r <= rin;
+    end if;
+  end process sync0;
+
+end architecture rtl;
+

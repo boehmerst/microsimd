@@ -1,0 +1,11 @@
+image/obj/driver/hibi/hibi_pif.o: src/driver/hibi/hibi_pif.c \
+ src/driver/hibi/hibi.h src/tools/types.h src/driver/hibi/hibi_pif.h \
+ src/driver/hibi/hibi_link.h
+
+src/driver/hibi/hibi.h:
+
+src/tools/types.h:
+
+src/driver/hibi/hibi_pif.h:
+
+src/driver/hibi/hibi_link.h:

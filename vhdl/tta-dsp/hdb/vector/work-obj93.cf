@@ -1,0 +1,7 @@
+v 4
+file . "fu_vec_lsu.vhd" "ce5b2683676b608f187ce81f871991fe81f38070" "20210323180116.687":
+  entity fu_vec_lsu at 1( 0) + 0 on 41;
+  architecture rtl of fu_vec_lsu at 38( 1166) + 0 on 42;
+file . "../base/func_pkg.vhd" "f531a552dd0ff9f6efc7804839c528ef8feea1ee" "20210323100218.955":
+  package func_pkg at 1( 0) + 0 on 19 body;
+  package body func_pkg at 43( 2663) + 0 on 20;

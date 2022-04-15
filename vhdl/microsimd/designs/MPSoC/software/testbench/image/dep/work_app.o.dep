@@ -1,0 +1,15 @@
+image/obj/app/work_app.o: src/app/work_app.c src/app/work_app.h \
+ src/tools/types.h src/driver/hibi/hibi_dma.h src/driver/hibi/hibi.h \
+ src/driver/hibi/hibi_link.h src/driver/cpu/cpu.h
+
+src/app/work_app.h:
+
+src/tools/types.h:
+
+src/driver/hibi/hibi_dma.h:
+
+src/driver/hibi/hibi.h:
+
+src/driver/hibi/hibi_link.h:
+
+src/driver/cpu/cpu.h:

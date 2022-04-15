@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<adf-implementation>
+
+  <ic-decoder-plugin>
+    <name>DefaultICDecoder</name>
+    <file>tce:DefaultICDecoderPlugin.so</file>
+  </ic-decoder-plugin>
+
+  <fu name="PARAM_LSU">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/base.hdb</hdb-file>
+    <fu-id>5</fu-id>
+  </fu>
+
+  <fu name="ALU_1">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/base.hdb</hdb-file>
+    <fu-id>2</fu-id>
+  </fu>
+
+  <fu name="ALU_0">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/base.hdb</hdb-file>
+    <fu-id>2</fu-id>
+  </fu>
+
+  <fu name="DATA_LSU">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/base.hdb</hdb-file>
+    <fu-id>5</fu-id>
+  </fu>
+
+  <fu name="VLSU">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/vector.hdb</hdb-file>
+    <fu-id>4</fu-id>
+  </fu>
+
+  <fu name="VEXTRACT">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/vector.hdb</hdb-file>
+    <fu-id>1</fu-id>
+  </fu>
+
+  <fu name="VBCAST">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/vector.hdb</hdb-file>
+    <fu-id>2</fu-id>
+  </fu>
+
+  <fu name="VALU">
+    <hdb-file>/home/boehmers/VLSI/dsp/microsimd/vhdl/tta-dsp/hdb/simd.hdb</hdb-file>
+    <fu-id>2</fu-id>
+  </fu>
+
+  <rf name="BOOL">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>963</rf-id>
+  </rf>
+
+  <rf name="RF_32_0">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>1055</rf-id>
+  </rf>
+
+  <rf name="RF_128_0">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>1055</rf-id>
+  </rf>
+
+  <iu name="IU_1x32">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>161</rf-id>
+  </iu>
+
+</adf-implementation>

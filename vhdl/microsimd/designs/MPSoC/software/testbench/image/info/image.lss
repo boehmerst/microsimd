@@ -1,0 +1,592 @@
+
+image/img/image.elf:     file format elf32-microblaze
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .vectors.reset 00000004  00000000  00000000  00000094  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .mem2         00000580  00100000  00100000  000008d4  2**2
+                  ALLOC
+  2 .text         000007e0  00000050  00000050  00000098  2**2
+                  CONTENTS, ALLOC, LOAD, CODE
+  3 .rodata       00000053  00000830  00000830  00000878  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .data         00000008  00000884  00000884  000008cc  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  5 .bss          00000008  0000088c  0000088c  000008d4  2**2
+                  ALLOC
+  6 .stack        00000404  00000894  00000894  000008d4  2**0
+                  ALLOC
+
+Disassembly of section .vectors.reset:
+
+00000000 <_start>:
+   0:	b80800cc 	brai	204	// cc <_start1>
+
+Disassembly of section .text:
+
+00000050 <_crtinit>:
+  50:	2021ffec 	addi	r1, r1, -20
+  54:	f9e10000 	swi	r15, r1, 0
+  58:	20c0088c 	addi	r6, r0, 2188	// 88c <__sbss_end>
+  5c:	20e0088c 	addi	r7, r0, 2188	// 88c <__sbss_end>
+  60:	06463800 	rsub	r18, r6, r7
+  64:	bc720014 	blei	r18, 20		// 78
+  68:	f8060000 	swi	r0, r6, 0
+  6c:	20c60004 	addi	r6, r6, 4
+  70:	06463800 	rsub	r18, r6, r7
+  74:	bc92fff4 	bgti	r18, -12		// 68
+  78:	20c0088c 	addi	r6, r0, 2188	// 88c <__sbss_end>
+  7c:	20e00894 	addi	r7, r0, 2196	// 894 <__bss_end>
+  80:	06463800 	rsub	r18, r6, r7
+  84:	bc720014 	blei	r18, 20		// 98
+  88:	f8060000 	swi	r0, r6, 0
+  8c:	20c60004 	addi	r6, r6, 4
+  90:	06463800 	rsub	r18, r6, r7
+  94:	bc92fff4 	bgti	r18, -12		// 88
+  98:	b9f40770 	brlid	r15, 1904	// 808 <__init>
+  9c:	80000000 	or	r0, r0, r0
+  a0:	20c00000 	addi	r6, r0, 0
+  a4:	20e00000 	addi	r7, r0, 0
+  a8:	b9f40710 	brlid	r15, 1808	// 7b8 <main>
+  ac:	20a00000 	addi	r5, r0, 0
+  b0:	32630000 	addik	r19, r3, 0
+  b4:	b9f40768 	brlid	r15, 1896	// 81c <__fini>
+  b8:	80000000 	or	r0, r0, r0
+  bc:	c9e10000 	lw	r15, r1, r0
+  c0:	30730000 	addik	r3, r19, 0
+  c4:	b60f0008 	rtsd	r15, 8
+  c8:	20210014 	addi	r1, r1, 20
+
+000000cc <_start1>:
+  cc:	31a00890 	addik	r13, r0, 2192	// 890 <_SDA_BASE_>
+  d0:	30400888 	addik	r2, r0, 2184	// 888 <GLOBAL_BUILD_DATE>
+  d4:	30200c88 	addik	r1, r0, 3208
+  d8:	b9f4ff78 	brlid	r15, -136	// 50 <_crtinit>
+  dc:	80000000 	or	r0, r0, r0
+  e0:	b9f40008 	brlid	r15, 8	// e8 <_exit>
+  e4:	30a30000 	addik	r5, r3, 0
+
+000000e8 <_exit>:
+  e8:	b8000000 	bri	0	// e8 <_exit>
+
+000000ec <ctrl_app>:
+  ec:	3021ffdc 	addik	r1, r1, -36
+  f0:	fac10020 	swi	r22, r1, 32
+  f4:	eac00838 	lwi	r22, r0, 2104
+  f8:	30c00001 	addik	r6, r0, 1
+  fc:	f9e10000 	swi	r15, r1, 0
+ 100:	10b60000 	addk	r5, r22, r0
+ 104:	b9f4008c 	brlid	r15, 140	// 190 <remote_dma_enable>
+ 108:	fa61001c 	swi	r19, r1, 28
+ 10c:	ea60083c 	lwi	r19, r0, 2108
+ 110:	10c00000 	addk	r6, r0, r0
+ 114:	10e60000 	addk	r7, r6, r0
+ 118:	10b30000 	addk	r5, r19, r0
+ 11c:	11260000 	addk	r9, r6, r0
+ 120:	b9f4021c 	brlid	r15, 540	// 33c <remote_dma_recv>
+ 124:	31000c80 	addik	r8, r0, 3200
+ 128:	10c00000 	addk	r6, r0, r0
+ 12c:	10f30000 	addk	r7, r19, r0
+ 130:	11060000 	addk	r8, r6, r0
+ 134:	10b60000 	addk	r5, r22, r0
+ 138:	31200028 	addik	r9, r0, 40
+ 13c:	b9f40240 	brlid	r15, 576	// 37c <remote_dma_send>
+ 140:	31400001 	addik	r10, r0, 1
+ 144:	b9f40510 	brlid	r15, 1296	// 654 <hibi_pif_rxen>
+ 148:	80000000 	or	r0, r0, r0
+ 14c:	10b30000 	addk	r5, r19, r0
+ 150:	b9f40064 	brlid	r15, 100	// 1b4 <remote_dma_wait>
+ 154:	30c00001 	addik	r6, r0, 1
+ 158:	e9e10000 	lwi	r15, r1, 0
+ 15c:	ea61001c 	lwi	r19, r1, 28
+ 160:	eac10020 	lwi	r22, r1, 32
+ 164:	b60f0008 	rtsd	r15, 8
+ 168:	30210024 	addik	r1, r1, 36
+
+0000016c <init>:
+ 16c:	b60f0008 	rtsd	r15, 8
+ 170:	80000000 	or	r0, r0, r0
+
+00000174 <work_app>:
+ 174:	30600001 	addik	r3, r0, 1
+ 178:	b0000010 	imm	16
+ 17c:	f06002c0 	sbi	r3, r0, 704	// 1002c0 <buffer1>
+ 180:	b0000010 	imm	16
+ 184:	f0600000 	sbi	r3, r0, 0	// 100000 <buffer2>
+ 188:	b60f0008 	rtsd	r15, 8
+ 18c:	80000000 	or	r0, r0, r0
+
+00000190 <remote_dma_enable>:
+ 190:	3021ffe4 	addik	r1, r1, -28
+ 194:	f8c10024 	swi	r6, r1, 36
+ 198:	30e00001 	addik	r7, r0, 1
+ 19c:	f9e10000 	swi	r15, r1, 0
+ 1a0:	b9f40344 	brlid	r15, 836	// 4e4 <hibi_send_prio_b>
+ 1a4:	30c10024 	addik	r6, r1, 36
+ 1a8:	e9e10000 	lwi	r15, r1, 0
+ 1ac:	b60f0008 	rtsd	r15, 8
+ 1b0:	3021001c 	addik	r1, r1, 28
+
+000001b4 <remote_dma_wait>:
+ 1b4:	3021ffd8 	addik	r1, r1, -40
+ 1b8:	fac10024 	swi	r22, r1, 36
+ 1bc:	eac00840 	lwi	r22, r0, 2112	// 840 <hibi_rxmsg_channel>
+ 1c0:	fa610020 	swi	r19, r1, 32
+ 1c4:	12660000 	addk	r19, r6, r0
+ 1c8:	f9e10000 	swi	r15, r1, 0
+ 1cc:	82c5b000 	or	r22, r5, r22
+ 1d0:	10b60000 	addk	r5, r22, r0
+ 1d4:	b9f403bc 	brlid	r15, 956	// 590 <hibi_read_prio_b>
+ 1d8:	30c1001c 	addik	r6, r1, 28
+ 1dc:	e861001c 	lwi	r3, r1, 28
+ 1e0:	84731800 	and	r3, r19, r3
+ 1e4:	be23fff0 	bneid	r3, -16		// 1d4
+ 1e8:	10b60000 	addk	r5, r22, r0
+ 1ec:	e9e10000 	lwi	r15, r1, 0
+ 1f0:	ea610020 	lwi	r19, r1, 32
+ 1f4:	eac10024 	lwi	r22, r1, 36
+ 1f8:	b60f0008 	rtsd	r15, 8
+ 1fc:	30210028 	addik	r1, r1, 40
+
+00000200 <remote_dma_tx_setup>:
+ 200:	3021ffc8 	addik	r1, r1, -56
+ 204:	fa610028 	swi	r19, r1, 40
+ 208:	fac1002c 	swi	r22, r1, 44
+ 20c:	12650000 	addk	r19, r5, r0
+ 210:	66c60402 	bslli	r22, r6, 2
+ 214:	654a0415 	bslli	r10, r10, 21
+ 218:	30b60004 	addik	r5, r22, 4
+ 21c:	b0000002 	imm	2
+ 220:	a1298000 	ori	r9, r9, -32768
+ 224:	81295000 	or	r9, r9, r10
+ 228:	fae10030 	swi	r23, r1, 48
+ 22c:	80a59800 	or	r5, r5, r19
+ 230:	12e70000 	addk	r23, r7, r0
+ 234:	30c10024 	addik	r6, r1, 36
+ 238:	30e00001 	addik	r7, r0, 1
+ 23c:	f9e10000 	swi	r15, r1, 0
+ 240:	f9210024 	swi	r9, r1, 36
+ 244:	fb010034 	swi	r24, r1, 52
+ 248:	b9f4029c 	brlid	r15, 668	// 4e4 <hibi_send_prio_b>
+ 24c:	13080000 	addk	r24, r8, r0
+ 250:	30b60005 	addik	r5, r22, 5
+ 254:	80a59800 	or	r5, r5, r19
+ 258:	30c10020 	addik	r6, r1, 32
+ 25c:	30e00001 	addik	r7, r0, 1
+ 260:	b9f40284 	brlid	r15, 644	// 4e4 <hibi_send_prio_b>
+ 264:	fb010020 	swi	r24, r1, 32
+ 268:	30b60006 	addik	r5, r22, 6
+ 26c:	80a59800 	or	r5, r5, r19
+ 270:	30c1001c 	addik	r6, r1, 28
+ 274:	30e00001 	addik	r7, r0, 1
+ 278:	b9f4026c 	brlid	r15, 620	// 4e4 <hibi_send_prio_b>
+ 27c:	fae1001c 	swi	r23, r1, 28
+ 280:	e9e10000 	lwi	r15, r1, 0
+ 284:	ea610028 	lwi	r19, r1, 40
+ 288:	eac1002c 	lwi	r22, r1, 44
+ 28c:	eae10030 	lwi	r23, r1, 48
+ 290:	eb010034 	lwi	r24, r1, 52
+ 294:	b60f0008 	rtsd	r15, 8
+ 298:	30210038 	addik	r1, r1, 56
+
+0000029c <remote_dma_rx_setup>:
+ 29c:	3021ffd0 	addik	r1, r1, -48
+ 2a0:	fa610024 	swi	r19, r1, 36
+ 2a4:	fac10028 	swi	r22, r1, 40
+ 2a8:	12650000 	addk	r19, r5, r0
+ 2ac:	66c60402 	bslli	r22, r6, 2
+ 2b0:	65290415 	bslli	r9, r9, 21
+ 2b4:	30b60004 	addik	r5, r22, 4
+ 2b8:	b0000004 	imm	4
+ 2bc:	a1080000 	ori	r8, r8, 0
+ 2c0:	81084800 	or	r8, r8, r9
+ 2c4:	fae1002c 	swi	r23, r1, 44
+ 2c8:	80a59800 	or	r5, r5, r19
+ 2cc:	12e70000 	addk	r23, r7, r0
+ 2d0:	30c10020 	addik	r6, r1, 32
+ 2d4:	30e00001 	addik	r7, r0, 1
+ 2d8:	f9e10000 	swi	r15, r1, 0
+ 2dc:	b9f40208 	brlid	r15, 520	// 4e4 <hibi_send_prio_b>
+ 2e0:	f9010020 	swi	r8, r1, 32
+ 2e4:	30b60005 	addik	r5, r22, 5
+ 2e8:	80a59800 	or	r5, r5, r19
+ 2ec:	30c1001c 	addik	r6, r1, 28
+ 2f0:	30e00001 	addik	r7, r0, 1
+ 2f4:	b9f401f0 	brlid	r15, 496	// 4e4 <hibi_send_prio_b>
+ 2f8:	fae1001c 	swi	r23, r1, 28
+ 2fc:	e9e10000 	lwi	r15, r1, 0
+ 300:	ea610024 	lwi	r19, r1, 36
+ 304:	eac10028 	lwi	r22, r1, 40
+ 308:	eae1002c 	lwi	r23, r1, 44
+ 30c:	b60f0008 	rtsd	r15, 8
+ 310:	30210030 	addik	r1, r1, 48
+
+00000314 <remote_dma_start>:
+ 314:	3021ffe4 	addik	r1, r1, -28
+ 318:	f8c10024 	swi	r6, r1, 36
+ 31c:	a0a50002 	ori	r5, r5, 2
+ 320:	30c10024 	addik	r6, r1, 36
+ 324:	f9e10000 	swi	r15, r1, 0
+ 328:	b9f401bc 	brlid	r15, 444	// 4e4 <hibi_send_prio_b>
+ 32c:	30e00001 	addik	r7, r0, 1
+ 330:	e9e10000 	lwi	r15, r1, 0
+ 334:	b60f0008 	rtsd	r15, 8
+ 338:	3021001c 	addik	r1, r1, 28
+
+0000033c <remote_dma_recv>:
+ 33c:	3021ffdc 	addik	r1, r1, -36
+ 340:	fac10020 	swi	r22, r1, 32
+ 344:	12c50000 	addk	r22, r5, r0
+ 348:	fa61001c 	swi	r19, r1, 28
+ 34c:	f9e10000 	swi	r15, r1, 0
+ 350:	b9f4ff4c 	brlid	r15, -180	// 29c <remote_dma_rx_setup>
+ 354:	12660000 	addk	r19, r6, r0
+ 358:	10b60000 	addk	r5, r22, r0
+ 35c:	30c00001 	addik	r6, r0, 1
+ 360:	b9f4ffb4 	brlid	r15, -76	// 314 <remote_dma_start>
+ 364:	44c69c00 	bsll	r6, r6, r19
+ 368:	e9e10000 	lwi	r15, r1, 0
+ 36c:	ea61001c 	lwi	r19, r1, 28
+ 370:	eac10020 	lwi	r22, r1, 32
+ 374:	b60f0008 	rtsd	r15, 8
+ 378:	30210024 	addik	r1, r1, 36
+
+0000037c <remote_dma_send>:
+ 37c:	3021ffdc 	addik	r1, r1, -36
+ 380:	fac10020 	swi	r22, r1, 32
+ 384:	12c50000 	addk	r22, r5, r0
+ 388:	fa61001c 	swi	r19, r1, 28
+ 38c:	f9e10000 	swi	r15, r1, 0
+ 390:	b9f4fe70 	brlid	r15, -400	// 200 <remote_dma_tx_setup>
+ 394:	12660000 	addk	r19, r6, r0
+ 398:	10b60000 	addk	r5, r22, r0
+ 39c:	30c00001 	addik	r6, r0, 1
+ 3a0:	b9f4ff74 	brlid	r15, -140	// 314 <remote_dma_start>
+ 3a4:	44c69c00 	bsll	r6, r6, r19
+ 3a8:	e9e10000 	lwi	r15, r1, 0
+ 3ac:	ea61001c 	lwi	r19, r1, 28
+ 3b0:	eac10020 	lwi	r22, r1, 32
+ 3b4:	b60f0008 	rtsd	r15, 8
+ 3b8:	30210024 	addik	r1, r1, 36
+
+000003bc <remote_dma_chain>:
+ 3bc:	64c60402 	bslli	r6, r6, 2
+ 3c0:	3021ffe4 	addik	r1, r1, -28
+ 3c4:	30c60007 	addik	r6, r6, 7
+ 3c8:	f8e10028 	swi	r7, r1, 40
+ 3cc:	80a62800 	or	r5, r6, r5
+ 3d0:	30e00001 	addik	r7, r0, 1
+ 3d4:	f9e10000 	swi	r15, r1, 0
+ 3d8:	b9f4010c 	brlid	r15, 268	// 4e4 <hibi_send_prio_b>
+ 3dc:	30c10028 	addik	r6, r1, 40
+ 3e0:	e9e10000 	lwi	r15, r1, 0
+ 3e4:	b60f0008 	rtsd	r15, 8
+ 3e8:	3021001c 	addik	r1, r1, 28
+
+000003ec <hibi_dma_enable>:
+ 3ec:	10600000 	addk	r3, r0, r0
+ 3f0:	6c03e000 	ncput	r3, rfsl0
+ 3f4:	6c05c000 	nput	r5, rfsl0
+ 3f8:	b60f0008 	rtsd	r15, 8
+ 3fc:	80000000 	or	r0, r0, r0
+
+00000400 <hibi_dma_send>:
+ 400:	64650402 	bslli	r3, r5, 2
+ 404:	b0000002 	imm	2
+ 408:	a1088000 	ori	r8, r8, -32768
+ 40c:	30830004 	addik	r4, r3, 4
+ 410:	6c04e000 	ncput	r4, rfsl0
+ 414:	6c08c000 	nput	r8, rfsl0
+ 418:	30830005 	addik	r4, r3, 5
+ 41c:	6c04e000 	ncput	r4, rfsl0
+ 420:	6c07c000 	nput	r7, rfsl0
+ 424:	30630006 	addik	r3, r3, 6
+ 428:	6c03e000 	ncput	r3, rfsl0
+ 42c:	6c06c000 	nput	r6, rfsl0
+ 430:	30600001 	addik	r3, r0, 1
+ 434:	44a32c00 	bsll	r5, r3, r5
+ 438:	30600002 	addik	r3, r0, 2
+ 43c:	6c03e000 	ncput	r3, rfsl0
+ 440:	6c05c000 	nput	r5, rfsl0
+ 444:	b60f0008 	rtsd	r15, 8
+ 448:	80000000 	or	r0, r0, r0
+
+0000044c <hibi_dma_rec>:
+ 44c:	64650402 	bslli	r3, r5, 2
+ 450:	30830004 	addik	r4, r3, 4
+ 454:	6c04e000 	ncput	r4, rfsl0
+ 458:	6c07c000 	nput	r7, rfsl0
+ 45c:	30630005 	addik	r3, r3, 5
+ 460:	6c03e000 	ncput	r3, rfsl0
+ 464:	6c06c000 	nput	r6, rfsl0
+ 468:	30600001 	addik	r3, r0, 1
+ 46c:	44a32c00 	bsll	r5, r3, r5
+ 470:	30600002 	addik	r3, r0, 2
+ 474:	6c03e000 	ncput	r3, rfsl0
+ 478:	6c05c000 	nput	r5, rfsl0
+ 47c:	b60f0008 	rtsd	r15, 8
+ 480:	80000000 	or	r0, r0, r0
+
+00000484 <hibi_send_b>:
+ 484:	3021fff8 	addik	r1, r1, -8
+ 488:	b0000002 	imm	2
+ 48c:	a0e78000 	ori	r7, r7, -32768
+ 490:	30600004 	addik	r3, r0, 4
+ 494:	6c03e000 	ncput	r3, rfsl0
+ 498:	6c07c000 	nput	r7, rfsl0
+ 49c:	30600005 	addik	r3, r0, 5
+ 4a0:	6c03e000 	ncput	r3, rfsl0
+ 4a4:	6c06c000 	nput	r6, rfsl0
+ 4a8:	30600006 	addik	r3, r0, 6
+ 4ac:	6c03e000 	ncput	r3, rfsl0
+ 4b0:	6c05c000 	nput	r5, rfsl0
+ 4b4:	30800001 	addik	r4, r0, 1
+ 4b8:	30600002 	addik	r3, r0, 2
+ 4bc:	6c03e000 	ncput	r3, rfsl0
+ 4c0:	6c04c000 	nput	r4, rfsl0
+ 4c4:	6c04e000 	ncput	r4, rfsl0
+ 4c8:	6c604000 	nget	r3, rfsl0
+ 4cc:	f8610004 	swi	r3, r1, 4
+ 4d0:	e8610004 	lwi	r3, r1, 4
+ 4d4:	a4630001 	andi	r3, r3, 1
+ 4d8:	bc23ffec 	bnei	r3, -20		// 4c4
+ 4dc:	b60f0008 	rtsd	r15, 8
+ 4e0:	30210008 	addik	r1, r1, 8
+
+000004e4 <hibi_send_prio_b>:
+ 4e4:	3021fff8 	addik	r1, r1, -8
+ 4e8:	b0000003 	imm	3
+ 4ec:	a0e78000 	ori	r7, r7, -32768
+ 4f0:	30600004 	addik	r3, r0, 4
+ 4f4:	6c03e000 	ncput	r3, rfsl0
+ 4f8:	6c07c000 	nput	r7, rfsl0
+ 4fc:	30600005 	addik	r3, r0, 5
+ 500:	6c03e000 	ncput	r3, rfsl0
+ 504:	6c06c000 	nput	r6, rfsl0
+ 508:	30600006 	addik	r3, r0, 6
+ 50c:	6c03e000 	ncput	r3, rfsl0
+ 510:	6c05c000 	nput	r5, rfsl0
+ 514:	30800001 	addik	r4, r0, 1
+ 518:	30600002 	addik	r3, r0, 2
+ 51c:	6c03e000 	ncput	r3, rfsl0
+ 520:	6c04c000 	nput	r4, rfsl0
+ 524:	6c04e000 	ncput	r4, rfsl0
+ 528:	6c604000 	nget	r3, rfsl0
+ 52c:	f8610004 	swi	r3, r1, 4
+ 530:	e8610004 	lwi	r3, r1, 4
+ 534:	a4630001 	andi	r3, r3, 1
+ 538:	bc23ffec 	bnei	r3, -20		// 524
+ 53c:	b60f0008 	rtsd	r15, 8
+ 540:	30210008 	addik	r1, r1, 8
+
+00000544 <hibi_recv_b>:
+ 544:	3021fff8 	addik	r1, r1, -8
+ 548:	30600008 	addik	r3, r0, 8
+ 54c:	6c03e000 	ncput	r3, rfsl0
+ 550:	6c06c000 	nput	r6, rfsl0
+ 554:	30600009 	addik	r3, r0, 9
+ 558:	6c03e000 	ncput	r3, rfsl0
+ 55c:	6c05c000 	nput	r5, rfsl0
+ 560:	30600002 	addik	r3, r0, 2
+ 564:	6c03e000 	ncput	r3, rfsl0
+ 568:	6c03c000 	nput	r3, rfsl0
+ 56c:	30800001 	addik	r4, r0, 1
+ 570:	6c04e000 	ncput	r4, rfsl0
+ 574:	6c604000 	nget	r3, rfsl0
+ 578:	f8610004 	swi	r3, r1, 4
+ 57c:	e8610004 	lwi	r3, r1, 4
+ 580:	a4630002 	andi	r3, r3, 2
+ 584:	bc23ffec 	bnei	r3, -20		// 570
+ 588:	b60f0008 	rtsd	r15, 8
+ 58c:	30210008 	addik	r1, r1, 8
+
+00000590 <hibi_read_prio_b>:
+ 590:	3021fff8 	addik	r1, r1, -8
+ 594:	b0000005 	imm	5
+ 598:	30808001 	addik	r4, r0, -32767
+ 59c:	30600004 	addik	r3, r0, 4
+ 5a0:	6c03e000 	ncput	r3, rfsl0
+ 5a4:	6c04c000 	nput	r4, rfsl0
+ 5a8:	e860088c 	lwi	r3, r0, 2188	// 88c <__sbss_end>
+ 5ac:	64630402 	bslli	r3, r3, 2
+ 5b0:	e8830830 	lwi	r4, r3, 2096
+ 5b4:	30600005 	addik	r3, r0, 5
+ 5b8:	a0840001 	ori	r4, r4, 1
+ 5bc:	6c03e000 	ncput	r3, rfsl0
+ 5c0:	6c04c000 	nput	r4, rfsl0
+ 5c4:	30600006 	addik	r3, r0, 6
+ 5c8:	6c03e000 	ncput	r3, rfsl0
+ 5cc:	6c05c000 	nput	r5, rfsl0
+ 5d0:	30800001 	addik	r4, r0, 1
+ 5d4:	30600002 	addik	r3, r0, 2
+ 5d8:	6c03e000 	ncput	r3, rfsl0
+ 5dc:	6c04c000 	nput	r4, rfsl0
+ 5e0:	30600008 	addik	r3, r0, 8
+ 5e4:	6c03e000 	ncput	r3, rfsl0
+ 5e8:	6c04c000 	nput	r4, rfsl0
+ 5ec:	30600009 	addik	r3, r0, 9
+ 5f0:	6c03e000 	ncput	r3, rfsl0
+ 5f4:	6c06c000 	nput	r6, rfsl0
+ 5f8:	30600002 	addik	r3, r0, 2
+ 5fc:	6c03e000 	ncput	r3, rfsl0
+ 600:	6c03c000 	nput	r3, rfsl0
+ 604:	6c04e000 	ncput	r4, rfsl0
+ 608:	6c604000 	nget	r3, rfsl0
+ 60c:	f8610004 	swi	r3, r1, 4
+ 610:	e8610004 	lwi	r3, r1, 4
+ 614:	a4630002 	andi	r3, r3, 2
+ 618:	bc23ffec 	bnei	r3, -20		// 604
+ 61c:	b60f0008 	rtsd	r15, 8
+ 620:	30210008 	addik	r1, r1, 8
+
+00000624 <hibi_pif_txen>:
+ 624:	e8a00838 	lwi	r5, r0, 2104
+ 628:	3021ffe0 	addik	r1, r1, -32
+ 62c:	30600010 	addik	r3, r0, 16
+ 630:	a0a50016 	ori	r5, r5, 22
+ 634:	30c1001c 	addik	r6, r1, 28
+ 638:	30e00001 	addik	r7, r0, 1
+ 63c:	f9e10000 	swi	r15, r1, 0
+ 640:	b9f4fea4 	brlid	r15, -348	// 4e4 <hibi_send_prio_b>
+ 644:	f861001c 	swi	r3, r1, 28
+ 648:	e9e10000 	lwi	r15, r1, 0
+ 64c:	b60f0008 	rtsd	r15, 8
+ 650:	30210020 	addik	r1, r1, 32
+
+00000654 <hibi_pif_rxen>:
+ 654:	e8a00838 	lwi	r5, r0, 2104
+ 658:	3021ffe0 	addik	r1, r1, -32
+ 65c:	30600020 	addik	r3, r0, 32
+ 660:	a0a50016 	ori	r5, r5, 22
+ 664:	30c1001c 	addik	r6, r1, 28
+ 668:	30e00001 	addik	r7, r0, 1
+ 66c:	f9e10000 	swi	r15, r1, 0
+ 670:	b9f4fe74 	brlid	r15, -396	// 4e4 <hibi_send_prio_b>
+ 674:	f861001c 	swi	r3, r1, 28
+ 678:	e9e10000 	lwi	r15, r1, 0
+ 67c:	b60f0008 	rtsd	r15, 8
+ 680:	30210020 	addik	r1, r1, 32
+
+00000684 <hibi_pif_txcfg>:
+ 684:	64c60410 	bslli	r6, r6, 16
+ 688:	3021ffe0 	addik	r1, r1, -32
+ 68c:	80a62800 	or	r5, r6, r5
+ 690:	f8a1001c 	swi	r5, r1, 28
+ 694:	e8a00838 	lwi	r5, r0, 2104
+ 698:	30c1001c 	addik	r6, r1, 28
+ 69c:	a0a50014 	ori	r5, r5, 20
+ 6a0:	f9e10000 	swi	r15, r1, 0
+ 6a4:	b9f4fe40 	brlid	r15, -448	// 4e4 <hibi_send_prio_b>
+ 6a8:	30e00001 	addik	r7, r0, 1
+ 6ac:	e9e10000 	lwi	r15, r1, 0
+ 6b0:	b60f0008 	rtsd	r15, 8
+ 6b4:	30210020 	addik	r1, r1, 32
+
+000006b8 <hibi_pif_fe>:
+ 6b8:	e8a00838 	lwi	r5, r0, 2104
+ 6bc:	3021ffe0 	addik	r1, r1, -32
+ 6c0:	30600002 	addik	r3, r0, 2
+ 6c4:	a0a50015 	ori	r5, r5, 21
+ 6c8:	30c1001c 	addik	r6, r1, 28
+ 6cc:	30e00001 	addik	r7, r0, 1
+ 6d0:	f9e10000 	swi	r15, r1, 0
+ 6d4:	b9f4fe10 	brlid	r15, -496	// 4e4 <hibi_send_prio_b>
+ 6d8:	f861001c 	swi	r3, r1, 28
+ 6dc:	e9e10000 	lwi	r15, r1, 0
+ 6e0:	b60f0008 	rtsd	r15, 8
+ 6e4:	30210020 	addik	r1, r1, 32
+
+000006e8 <hibi_pif_le>:
+ 6e8:	e8a00838 	lwi	r5, r0, 2104
+ 6ec:	3021ffe0 	addik	r1, r1, -32
+ 6f0:	30e00001 	addik	r7, r0, 1
+ 6f4:	a0a50015 	ori	r5, r5, 21
+ 6f8:	30c1001c 	addik	r6, r1, 28
+ 6fc:	f9e10000 	swi	r15, r1, 0
+ 700:	b9f4fde4 	brlid	r15, -540	// 4e4 <hibi_send_prio_b>
+ 704:	f8e1001c 	swi	r7, r1, 28
+ 708:	e9e10000 	lwi	r15, r1, 0
+ 70c:	b60f0008 	rtsd	r15, 8
+ 710:	30210020 	addik	r1, r1, 32
+
+00000714 <cpu_init>:
+ 714:	e8600890 	lwi	r3, r0, 2192	// 890 <_SDA_BASE_>
+ 718:	bc230014 	bnei	r3, 20		// 72c
+ 71c:	5d003100 	vmovs	r3, v0, 0
+ 720:	f860088c 	swi	r3, r0, 2188	// 88c <__sbss_end>
+ 724:	30600001 	addik	r3, r0, 1
+ 728:	f8600890 	swi	r3, r0, 2192	// 890 <_SDA_BASE_>
+ 72c:	b60f0008 	rtsd	r15, 8
+ 730:	80000000 	or	r0, r0, r0
+
+00000734 <sync_cpu>:
+ 734:	3021ffd8 	addik	r1, r1, -40
+ 738:	fa610020 	swi	r19, r1, 32
+ 73c:	fac10024 	swi	r22, r1, 36
+ 740:	f9e10000 	swi	r15, r1, 0
+ 744:	a6c50001 	andi	r22, r5, 1
+ 748:	be16001c 	beqid	r22, 28		// 764
+ 74c:	12650000 	addk	r19, r5, r0
+ 750:	e8a00830 	lwi	r5, r0, 2096	// 830 <_etext>
+ 754:	30c1001c 	addik	r6, r1, 28
+ 758:	30e00001 	addik	r7, r0, 1
+ 75c:	b9f4fd28 	brlid	r15, -728	// 484 <hibi_send_b>
+ 760:	f801001c 	swi	r0, r1, 28
+ 764:	a6730002 	andi	r19, r19, 2
+ 768:	be130018 	beqid	r19, 24		// 780
+ 76c:	30e00001 	addik	r7, r0, 1
+ 770:	e8a00834 	lwi	r5, r0, 2100
+ 774:	30c1001c 	addik	r6, r1, 28
+ 778:	b9f4fd0c 	brlid	r15, -756	// 484 <hibi_send_b>
+ 77c:	f8e1001c 	swi	r7, r1, 28
+ 780:	be160010 	beqid	r22, 16		// 790
+ 784:	30a1001c 	addik	r5, r1, 28
+ 788:	b9f4fdbc 	brlid	r15, -580	// 544 <hibi_recv_b>
+ 78c:	30c00001 	addik	r6, r0, 1
+ 790:	be130018 	beqid	r19, 24		// 7a8
+ 794:	e9e10000 	lwi	r15, r1, 0
+ 798:	30a1001c 	addik	r5, r1, 28
+ 79c:	b9f4fda8 	brlid	r15, -600	// 544 <hibi_recv_b>
+ 7a0:	30c00001 	addik	r6, r0, 1
+ 7a4:	e9e10000 	lwi	r15, r1, 0
+ 7a8:	ea610020 	lwi	r19, r1, 32
+ 7ac:	eac10024 	lwi	r22, r1, 36
+ 7b0:	b60f0008 	rtsd	r15, 8
+ 7b4:	30210028 	addik	r1, r1, 40
+
+000007b8 <main>:
+ 7b8:	3021ffe0 	addik	r1, r1, -32
+ 7bc:	f9e10000 	swi	r15, r1, 0
+ 7c0:	b9f4ff54 	brlid	r15, -172	// 714 <cpu_init>
+ 7c4:	80000000 	or	r0, r0, r0
+ 7c8:	b9f4fc24 	brlid	r15, -988	// 3ec <hibi_dma_enable>
+ 7cc:	30a00001 	addik	r5, r0, 1
+ 7d0:	e860088c 	lwi	r3, r0, 2188	// 88c <__sbss_end>
+ 7d4:	be230024 	bneid	r3, 36		// 7f8
+ 7d8:	3081001c 	addik	r4, r1, 28
+ 7dc:	b000affe 	imm	-20482
+ 7e0:	3060dead 	addik	r3, r0, -8531
+ 7e4:	f861001c 	swi	r3, r1, 28
+ 7e8:	30600005 	addik	r3, r0, 5
+ 7ec:	6c03e000 	ncput	r3, rfsl0
+ 7f0:	6c04c000 	nput	r4, rfsl0
+ 7f4:	b8000000 	bri	0		// 7f4
+ 7f8:	e9e10000 	lwi	r15, r1, 0
+ 7fc:	10600000 	addk	r3, r0, r0
+ 800:	b60f0008 	rtsd	r15, 8
+ 804:	30210020 	addik	r1, r1, 32
+
+00000808 <__init>:
+ 808:	3021fff8 	addik	r1, r1, -8
+ 80c:	d9e00800 	sw	r15, r0, r1
+ 810:	c9e00800 	lw	r15, r0, r1
+ 814:	b60f0008 	rtsd	r15, 8
+ 818:	30210008 	addik	r1, r1, 8
+
+0000081c <__fini>:
+ 81c:	3021fff8 	addik	r1, r1, -8
+ 820:	d9e00800 	sw	r15, r0, r1
+ 824:	c9e00800 	lw	r15, r0, r1
+ 828:	b60f0008 	rtsd	r15, 8
+ 82c:	30210008 	addik	r1, r1, 8

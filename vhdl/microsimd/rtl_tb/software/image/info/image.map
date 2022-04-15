@@ -1,0 +1,263 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD image/obj/startup/crtinit.o
+LOAD image/obj/startup/startup.o
+LOAD image/obj/startup/crti.o
+LOAD image/obj/startup/crtn.o
+LOAD image/obj/app/verify_vadd.o
+LOAD image/obj/app/main.o
+LOAD image/obj/app/verify_vsub.o
+LOAD image/obj/build_info.o
+                [0x0000000000000050]                _TEXT_START_ADDR = DEFINED (_TEXT_START_ADDR)?_TEXT_START_ADDR:0x50
+                [0x0000000000000000]                _HEAP_SIZE = DEFINED (_HEAP_SIZE)?_HEAP_SIZE:0x0
+                [0x0000000000000400]                _STACK_SIZE = DEFINED (_STACK_SIZE)?_STACK_SIZE:0x400
+
+.vectors.reset  0x0000000000000000        0x4
+ *(.vectors.reset)
+ .vectors.reset
+                0x0000000000000000        0x4 image/obj/startup/startup.o
+                0x0000000000000000                _start
+
+.vectors.sw_exception
+ *(.vectors.sw_exception)
+
+.vectors.interrupt
+ *(.vectors.interrupt)
+
+.vectors.debug_sw_break
+ *(.vectors.debug_sw_break)
+
+.vectors.hw_exception
+ *(.vectors.hw_exception)
+                0x0000000000000050                . = _TEXT_START_ADDR
+                0x0000000000000050                _ftext = .
+
+.text           0x0000000000000050     0x4ae8
+ *(.text)
+ .text          0x0000000000000050       0x7c image/obj/startup/crtinit.o
+                0x0000000000000050                _crtinit
+ .text          0x00000000000000cc       0x20 image/obj/startup/startup.o
+                0x00000000000000cc                _start1
+                0x00000000000000e8                _exit
+ .text          0x00000000000000ec        0x0 image/obj/startup/crti.o
+ .text          0x00000000000000ec        0x0 image/obj/startup/crtn.o
+ .text          0x00000000000000ec     0x2464 image/obj/app/verify_vadd.o
+                0x00000000000006fc                verify_vaddi8
+                0x0000000000001d98                verify_vaddi16
+                0x0000000000002214                verify_vaddi32
+ .text          0x0000000000002550      0x184 image/obj/app/main.o
+                0x0000000000002610                main
+ .text          0x00000000000026d4     0x2464 image/obj/app/verify_vsub.o
+                0x0000000000002ce4                verify_vsubi8
+                0x0000000000004380                verify_vsubi16
+                0x00000000000047fc                verify_vsubi32
+ .text          0x0000000000004b38        0x0 image/obj/build_info.o
+ *(.text.*)
+ *(.gnu.linkonce.t.*)
+                0x0000000000004b38                _etext = .
+
+.init           0x0000000000004b38       0x14
+ *(.init)
+ .init          0x0000000000004b38        0x8 image/obj/startup/crti.o
+                0x0000000000004b38                __init
+ .init          0x0000000000004b40        0xc image/obj/startup/crtn.o
+
+.fini           0x0000000000004b4c       0x14
+ *(.fini)
+ .fini          0x0000000000004b4c        0x8 image/obj/startup/crti.o
+                0x0000000000004b4c                __fini
+ .fini          0x0000000000004b54        0xc image/obj/startup/crtn.o
+                0x0000000000004b60                PROVIDE (__CTOR_LIST__, .)
+                0x0000000000004b60                PROVIDE (___CTOR_LIST__, .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *(EXCLUDE_FILE(*crtend.o) .ctors)
+ *(SORT(.ctors.*))
+ *(.ctors)
+                0x0000000000004b60                PROVIDE (__CTOR_END__, .)
+                0x0000000000004b60                PROVIDE (___CTOR_END__, .)
+                0x0000000000004b60                PROVIDE (__DTOR_LIST__, .)
+                0x0000000000004b60                PROVIDE (___DTOR_LIST__, .)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *(EXCLUDE_FILE(*crtend.o) .dtors)
+ *(SORT(.dtors.*))
+ *(.dtors)
+                0x0000000000004b60                PROVIDE (__DTOR_END__, .)
+                0x0000000000004b60                PROVIDE (___DTOR_END__, .)
+                0x0000000000004b60                . = ALIGN (0x4)
+                0x0000000000004b60                _frodata = .
+
+.rodata         0x0000000000004b60      0x2b5
+ *(.rodata)
+ .rodata        0x0000000000004b60      0x150 image/obj/app/verify_vadd.o
+ .rodata        0x0000000000004cb0      0x150 image/obj/app/verify_vsub.o
+ .rodata        0x0000000000004e00       0x15 image/obj/build_info.o
+ *(.rodata.*)
+ *(.gnu.linkonce.r.*)
+                0x0000000000004e15                _erodata = .
+
+.rela.dyn       0x0000000000004e18        0x0
+ .rela.text     0x0000000000000000        0x0 image/obj/startup/crtinit.o
+                0x0000000000004e18                . = ALIGN (0x8)
+                0x0000000000004e18                _ssrw = .
+
+.sdata2
+ *(.sdata2)
+ *(.sdata2.*)
+ *(.gnu.linkonce.s2.*)
+                0x0000000000004e18                . = ALIGN (0x4)
+
+.sbss2          0x0000000000004e18        0x0
+                0x0000000000004e18                PROVIDE (__sbss2_start, .)
+ *(.sbss2)
+ *(.sbss2.*)
+ *(.gnu.linkonce.sb2.*)
+                0x0000000000004e18                PROVIDE (__sbss2_end, .)
+                0x0000000000004e18                . = ALIGN (0x8)
+                0x0000000000004e18                _essrw = .
+                0x0000000000000000                _ssrw_size = (_essrw - _ssrw)
+                0x0000000000004e18                PROVIDE (_SDA2_BASE_, (_ssrw + (_ssrw_size / 0x2)))
+                0x0000000000004e18                . = ALIGN (0x4)
+                0x0000000000004e18                _fdata = .
+
+.data           0x0000000000004e18        0x8
+ *(.data)
+ .data          0x0000000000004e18        0x0 image/obj/startup/crtinit.o
+ .data          0x0000000000004e18        0x0 image/obj/startup/startup.o
+ .data          0x0000000000004e18        0x0 image/obj/startup/crti.o
+ .data          0x0000000000004e18        0x0 image/obj/startup/crtn.o
+ .data          0x0000000000004e18        0x0 image/obj/app/verify_vadd.o
+ .data          0x0000000000004e18        0x0 image/obj/app/main.o
+ .data          0x0000000000004e18        0x0 image/obj/app/verify_vsub.o
+ .data          0x0000000000004e18        0x8 image/obj/build_info.o
+                0x0000000000004e18                GLOBAL_BUILD_DATE
+                0x0000000000004e1c                GLOBAL_BUILD_TIME
+ *(.gnu.linkonce.d.*)
+                0x0000000000004e20                _edata = .
+
+.got
+ *(.got)
+
+.got1
+ *(.got1)
+
+.got2
+ *(.got2)
+
+.eh_frame
+ *(.eh_frame)
+
+.jcr
+ *(.jcr)
+
+.gcc_except_table
+ *(.gcc_except_table)
+                0x0000000000004e20                . = ALIGN (0x8)
+                0x0000000000004e20                _ssro = .
+
+.sdata
+ *(.sdata)
+ *(.sdata.*)
+ *(.gnu.linkonce.s.*)
+                0x0000000000004e20                . = ALIGN (0x4)
+
+.sbss           0x0000000000004e20        0x0
+                0x0000000000004e20                PROVIDE (__sbss_start, .)
+ *(.sbss)
+ *(.sbss.*)
+ *(.gnu.linkonce.sb.*)
+                0x0000000000004e20                PROVIDE (__sbss_end, .)
+                0x0000000000004e20                . = ALIGN (0x8)
+                0x0000000000004e20                _essro = .
+                0x0000000000000000                _ssro_size = (_essro - _ssro)
+                0x0000000000004e20                PROVIDE (_SDA_BASE_, (_ssro + (_ssro_size / 0x2)))
+                0x0000000000004e20                . = ALIGN (0x4)
+                0x0000000000004e20                _fbss = .
+
+.bss            0x0000000000004e20        0x0
+                0x0000000000004e20                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x0000000000004e20        0x0 image/obj/startup/crtinit.o
+ .bss           0x0000000000004e20        0x0 image/obj/startup/startup.o
+ .bss           0x0000000000004e20        0x0 image/obj/startup/crti.o
+ .bss           0x0000000000004e20        0x0 image/obj/startup/crtn.o
+ .bss           0x0000000000004e20        0x0 image/obj/app/verify_vadd.o
+ .bss           0x0000000000004e20        0x0 image/obj/app/main.o
+ .bss           0x0000000000004e20        0x0 image/obj/app/verify_vsub.o
+ .bss           0x0000000000004e20        0x0 image/obj/build_info.o
+ *(.bss.*)
+ *(.gnu.linkonce.b.*)
+ *(COMMON)
+                0x0000000000004e20                . = ALIGN (0x4)
+                0x0000000000004e20                PROVIDE (__bss_end, .)
+                0x0000000000004e20                . = ALIGN (0x4)
+
+.heap           0x0000000000004e20        0x0
+                0x0000000000004e20                _heap = .
+                0x0000000000004e20                _heap_start = .
+                0x0000000000004e20                . = (. + _HEAP_SIZE)
+                0x0000000000004e20                _heap_end = .
+                0x0000000000004e20                . = ALIGN (0x4)
+
+.stack          0x0000000000004e20      0x400
+                0x0000000000004e20                _stack_end = .
+                0x0000000000005220                . = (. + _STACK_SIZE)
+ *fill*         0x0000000000004e20      0x400 
+                0x0000000000005220                . = ALIGN (0x8)
+                0x0000000000005220                _stack = .
+                0x0000000000005220                _end = .
+
+.tdata
+ *(.tdata)
+ *(.tdata.*)
+ *(.gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss)
+ *(.tbss.*)
+ *(.gnu.linkonce.tb.*)
+OUTPUT(image/img/image.elf elf32-microblaze)
+
+Cross Reference Table
+
+Symbol                                            File
+GLOBAL_BUILD_DATE                                 image/obj/build_info.o
+GLOBAL_BUILD_TIME                                 image/obj/build_info.o
+_SDA2_BASE_                                       image/obj/startup/startup.o
+_SDA_BASE_                                        image/obj/startup/startup.o
+__bss_end                                         image/obj/startup/crtinit.o
+__bss_start                                       image/obj/startup/crtinit.o
+__fini                                            image/obj/startup/crti.o
+                                                  image/obj/startup/crtinit.o
+__init                                            image/obj/startup/crti.o
+                                                  image/obj/startup/crtinit.o
+__sbss_end                                        image/obj/startup/crtinit.o
+__sbss_start                                      image/obj/startup/crtinit.o
+_crtinit                                          image/obj/startup/crtinit.o
+                                                  image/obj/startup/startup.o
+_exit                                             image/obj/startup/startup.o
+_stack                                            image/obj/startup/startup.o
+_start                                            image/obj/startup/startup.o
+_start1                                           image/obj/startup/startup.o
+main                                              image/obj/app/main.o
+                                                  image/obj/startup/crtinit.o
+verify_vaddi16                                    image/obj/app/verify_vadd.o
+                                                  image/obj/app/main.o
+verify_vaddi32                                    image/obj/app/verify_vadd.o
+                                                  image/obj/app/main.o
+verify_vaddi8                                     image/obj/app/verify_vadd.o
+                                                  image/obj/app/main.o
+verify_vsubi16                                    image/obj/app/verify_vsub.o
+                                                  image/obj/app/main.o
+verify_vsubi32                                    image/obj/app/verify_vsub.o
+                                                  image/obj/app/main.o
+verify_vsubi8                                     image/obj/app/verify_vsub.o

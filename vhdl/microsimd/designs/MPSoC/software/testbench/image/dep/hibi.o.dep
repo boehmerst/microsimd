@@ -1,0 +1,6 @@
+image/obj/driver/hibi/hibi.o: src/driver/hibi/hibi.c \
+ src/driver/hibi/hibi.h src/tools/types.h
+
+src/driver/hibi/hibi.h:
+
+src/tools/types.h:

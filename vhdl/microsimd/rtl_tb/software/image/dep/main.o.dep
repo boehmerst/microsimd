@@ -1,0 +1,5 @@
+image/obj/app/main.o: src/app/main.c src/app/types.h src/app/fsl_macros.h
+
+src/app/types.h:
+
+src/app/fsl_macros.h:

@@ -1,0 +1,6 @@
+
+ OR   R1, R10, R12
+ AND  R1, R10, R12
+ XOR  R1, R10, R12
+ ANDN R1, R10, R12
+

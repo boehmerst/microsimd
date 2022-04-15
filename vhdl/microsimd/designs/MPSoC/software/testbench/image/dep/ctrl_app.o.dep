@@ -1,0 +1,20 @@
+image/obj/app/ctrl_app.o: src/app/ctrl_app.c src/app/ctrl_app.h \
+ src/app/work_app.h src/tools/types.h src/driver/hibi/hibi.h \
+ src/driver/hibi/hibi_link.h src/driver/hibi/hibi_pif.h \
+ src/driver/hibi/remote_dma.h src/driver/cpu/cpu.h
+
+src/app/ctrl_app.h:
+
+src/app/work_app.h:
+
+src/tools/types.h:
+
+src/driver/hibi/hibi.h:
+
+src/driver/hibi/hibi_link.h:
+
+src/driver/hibi/hibi_pif.h:
+
+src/driver/hibi/remote_dma.h:
+
+src/driver/cpu/cpu.h:

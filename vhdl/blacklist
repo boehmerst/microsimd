@@ -1,0 +1,7 @@
+# add libraries to be ignored
+# use '#' for comments
+# 
+#osvvm
+#modelsim_lib
+.svn
+

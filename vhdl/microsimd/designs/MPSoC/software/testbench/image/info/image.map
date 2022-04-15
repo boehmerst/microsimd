@@ -1,0 +1,377 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+MEM0             0x0000000000000050 0x0000000000002000
+MEM1             0x0000000000100000 0x0000000000002000
+MEM2             0x0000000000200000 0x0000000000002000
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD image/obj/startup/crtinit.o
+LOAD image/obj/startup/startup.o
+LOAD image/obj/startup/crti.o
+LOAD image/obj/startup/crtn.o
+LOAD image/obj/app/ctrl_app.o
+LOAD image/obj/app/main.o
+LOAD image/obj/app/work_app.o
+LOAD image/obj/driver/hibi/hibi.o
+LOAD image/obj/driver/hibi/remote_dma.o
+LOAD image/obj/driver/hibi/hibi_dma.o
+LOAD image/obj/driver/hibi/hibi_link.o
+LOAD image/obj/driver/hibi/hibi_pif.o
+LOAD image/obj/driver/cpu/cpu.o
+LOAD image/obj/build_info.o
+                [0x0000000000000050]                _TEXT_START_ADDR = DEFINED (_TEXT_START_ADDR)?_TEXT_START_ADDR:0x50
+                [0x0000000000000000]                _HEAP_SIZE = DEFINED (_HEAP_SIZE)?_HEAP_SIZE:0x0
+                [0x0000000000000400]                _STACK_SIZE = DEFINED (_STACK_SIZE)?_STACK_SIZE:0x400
+
+.vectors.reset  0x0000000000000000        0x4
+ *(.vectors.reset)
+ .vectors.reset
+                0x0000000000000000        0x4 image/obj/startup/startup.o
+                0x0000000000000000                _start
+
+.vectors.sw_exception
+ *(.vectors.sw_exception)
+
+.vectors.interrupt
+ *(.vectors.interrupt)
+
+.vectors.debug_sw_break
+ *(.vectors.debug_sw_break)
+
+.vectors.hw_exception
+ *(.vectors.hw_exception)
+                0x0000000000000050                . = _TEXT_START_ADDR
+                0x0000000000000050                _ftext = .
+
+.mem1
+ *(.mem1)
+ *(.mem1.*)
+
+.mem2           0x0000000000100000      0x580
+ *(.mem2)
+ .mem2          0x0000000000100000      0x580 image/obj/app/work_app.o
+ *(.mem2.*)
+
+.text           0x0000000000000050      0x7e0
+ *(.text)
+ .text          0x0000000000000050       0x7c image/obj/startup/crtinit.o
+                0x0000000000000050                _crtinit
+ .text          0x00000000000000cc       0x20 image/obj/startup/startup.o
+                0x00000000000000cc                _start1
+                0x00000000000000e8                _exit
+ .text          0x00000000000000ec        0x0 image/obj/startup/crti.o
+ .text          0x00000000000000ec        0x0 image/obj/startup/crtn.o
+ .text          0x00000000000000ec       0x80 image/obj/app/ctrl_app.o
+                0x00000000000000ec                ctrl_app
+ .text          0x000000000000016c        0x0 image/obj/app/main.o
+ .text          0x000000000000016c       0x24 image/obj/app/work_app.o
+                0x000000000000016c                init
+                0x0000000000000174                work_app
+ .text          0x0000000000000190        0x0 image/obj/driver/hibi/hibi.o
+ .text          0x0000000000000190      0x25c image/obj/driver/hibi/remote_dma.o
+                0x0000000000000190                remote_dma_enable
+                0x00000000000001b4                remote_dma_wait
+                0x0000000000000200                remote_dma_tx_setup
+                0x000000000000029c                remote_dma_rx_setup
+                0x0000000000000314                remote_dma_start
+                0x000000000000033c                remote_dma_recv
+                0x000000000000037c                remote_dma_send
+                0x00000000000003bc                remote_dma_chain
+ .text          0x00000000000003ec       0x98 image/obj/driver/hibi/hibi_dma.o
+                0x00000000000003ec                hibi_dma_enable
+                0x0000000000000400                hibi_dma_send
+                0x000000000000044c                hibi_dma_rec
+ .text          0x0000000000000484      0x1a0 image/obj/driver/hibi/hibi_link.o
+                0x0000000000000484                hibi_send_b
+                0x00000000000004e4                hibi_send_prio_b
+                0x0000000000000544                hibi_recv_b
+                0x0000000000000590                hibi_read_prio_b
+ .text          0x0000000000000624       0xf0 image/obj/driver/hibi/hibi_pif.o
+                0x0000000000000624                hibi_pif_txen
+                0x0000000000000654                hibi_pif_rxen
+                0x0000000000000684                hibi_pif_txcfg
+                0x00000000000006b8                hibi_pif_fe
+                0x00000000000006e8                hibi_pif_le
+ .text          0x0000000000000714       0xa4 image/obj/driver/cpu/cpu.o
+                0x0000000000000714                cpu_init
+                0x0000000000000734                sync_cpu
+ .text          0x00000000000007b8        0x0 image/obj/build_info.o
+ *(.text.*)
+ .text.startup  0x00000000000007b8       0x50 image/obj/app/main.o
+                0x00000000000007b8                main
+ *(.gnu.linkonce.t.*)
+ *(.init)
+ .init          0x0000000000000808        0x8 image/obj/startup/crti.o
+                0x0000000000000808                __init
+ .init          0x0000000000000810        0xc image/obj/startup/crtn.o
+ *(.fini)
+ .fini          0x000000000000081c        0x8 image/obj/startup/crti.o
+                0x000000000000081c                __fini
+ .fini          0x0000000000000824        0xc image/obj/startup/crtn.o
+                0x0000000000000830                _etext = .
+                0x0000000000000830                PROVIDE (__CTOR_LIST__, .)
+                0x0000000000000830                PROVIDE (___CTOR_LIST__, .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *(EXCLUDE_FILE(*crtend.o) .ctors)
+ *(SORT(.ctors.*))
+ *(.ctors)
+                0x0000000000000830                PROVIDE (__CTOR_END__, .)
+                0x0000000000000830                PROVIDE (___CTOR_END__, .)
+                0x0000000000000830                PROVIDE (__DTOR_LIST__, .)
+                0x0000000000000830                PROVIDE (___DTOR_LIST__, .)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *(EXCLUDE_FILE(*crtend.o) .dtors)
+ *(SORT(.dtors.*))
+ *(.dtors)
+                0x0000000000000830                PROVIDE (__DTOR_END__, .)
+                0x0000000000000830                PROVIDE (___DTOR_END__, .)
+                0x0000000000000830                . = ALIGN (0x4)
+                0x0000000000000830                _frodata = .
+
+.rodata         0x0000000000000830       0x53
+ *(.rodata)
+ .rodata        0x0000000000000830       0x10 image/obj/driver/hibi/hibi.o
+                0x0000000000000830                hibi_table
+ .rodata        0x0000000000000840       0x2c image/obj/driver/hibi/hibi_link.o
+                0x0000000000000840                hibi_rxmsg_channel
+                0x0000000000000844                hibi_txmsg_channel
+                0x0000000000000848                HIBI_DMA_HIBI_ADDR1_OFFSET
+                0x000000000000084c                HIBI_DMA_MEM_ADDR1_OFFSET
+                0x0000000000000850                HIBI_DMA_CFG1_OFFSET
+                0x0000000000000854                HIBI_DMA_HIBI_ADDR0_OFFSET
+                0x0000000000000858                HIBI_DMA_MEM_ADDR0_OFFSET
+                0x000000000000085c                HIBI_DMA_CFG0_OFFSET
+                0x0000000000000860                HIBI_DMA_TRIGGER_OFFSET
+                0x0000000000000864                HIBI_DMA_STATUS_OFFSET
+                0x0000000000000868                HIBI_DMA_CTRL_OFFSET
+ .rodata        0x000000000000086c       0x17 image/obj/build_info.o
+ *(.rodata.*)
+ *(.gnu.linkonce.r.*)
+                0x0000000000000883                _erodata = .
+
+.rela.dyn       0x0000000000000884        0x0
+ .rela.text     0x0000000000000000        0x0 image/obj/startup/crtinit.o
+ .rela.text.startup
+                0x0000000000000000        0x0 image/obj/startup/crtinit.o
+                0x0000000000000888                . = ALIGN (0x8)
+                0x0000000000000888                _ssrw = .
+
+.sdata2
+ *(.sdata2)
+ *(.sdata2.*)
+ *(.gnu.linkonce.s2.*)
+                0x0000000000000888                . = ALIGN (0x4)
+
+.sbss2          0x0000000000000883        0x0
+                0x0000000000000883                PROVIDE (__sbss2_start, .)
+ *(.sbss2)
+ *(.sbss2.*)
+ *(.gnu.linkonce.sb2.*)
+                0x0000000000000883                PROVIDE (__sbss2_end, .)
+                0x0000000000000888                . = ALIGN (0x8)
+                0x0000000000000888                _essrw = .
+                0x0000000000000000                _ssrw_size = (_essrw - _ssrw)
+                0x0000000000000888                PROVIDE (_SDA2_BASE_, (_ssrw + (_ssrw_size / 0x2)))
+                0x0000000000000888                . = ALIGN (0x4)
+                0x0000000000000888                _fdata = .
+
+.data           0x0000000000000884        0x8
+ *(.data)
+ .data          0x0000000000000884        0x0 image/obj/startup/crtinit.o
+ .data          0x0000000000000884        0x0 image/obj/startup/startup.o
+ .data          0x0000000000000884        0x0 image/obj/startup/crti.o
+ .data          0x0000000000000884        0x0 image/obj/startup/crtn.o
+ .data          0x0000000000000884        0x0 image/obj/app/ctrl_app.o
+ .data          0x0000000000000884        0x0 image/obj/app/main.o
+ .data          0x0000000000000884        0x0 image/obj/app/work_app.o
+ .data          0x0000000000000884        0x0 image/obj/driver/hibi/hibi.o
+ .data          0x0000000000000884        0x0 image/obj/driver/hibi/remote_dma.o
+ .data          0x0000000000000884        0x0 image/obj/driver/hibi/hibi_dma.o
+ .data          0x0000000000000884        0x0 image/obj/driver/hibi/hibi_link.o
+ .data          0x0000000000000884        0x0 image/obj/driver/hibi/hibi_pif.o
+ .data          0x0000000000000884        0x0 image/obj/driver/cpu/cpu.o
+ .data          0x0000000000000884        0x8 image/obj/build_info.o
+                0x0000000000000884                GLOBAL_BUILD_TIME
+                0x0000000000000888                GLOBAL_BUILD_DATE
+ *(.gnu.linkonce.d.*)
+                0x000000000000088c                _edata = .
+
+.got
+ *(.got)
+
+.got1
+ *(.got1)
+
+.got2
+ *(.got2)
+
+.eh_frame
+ *(.eh_frame)
+
+.jcr
+ *(.jcr)
+
+.gcc_except_table
+ *(.gcc_except_table)
+                0x0000000000000890                . = ALIGN (0x8)
+                0x0000000000000890                _ssro = .
+
+.sdata
+ *(.sdata)
+ *(.sdata.*)
+ *(.gnu.linkonce.s.*)
+                0x0000000000000890                . = ALIGN (0x4)
+
+.sbss           0x000000000000088c        0x0
+                0x000000000000088c                PROVIDE (__sbss_start, .)
+ *(.sbss)
+ *(.sbss.*)
+ *(.gnu.linkonce.sb.*)
+                0x000000000000088c                PROVIDE (__sbss_end, .)
+                0x0000000000000890                . = ALIGN (0x8)
+                0x0000000000000890                _essro = .
+                0x0000000000000000                _ssro_size = (_essro - _ssro)
+                0x0000000000000890                PROVIDE (_SDA_BASE_, (_ssro + (_ssro_size / 0x2)))
+                0x0000000000000890                . = ALIGN (0x4)
+                0x0000000000000890                _fbss = .
+
+.bss            0x000000000000088c        0x8
+                0x000000000000088c                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x000000000000088c        0x0 image/obj/startup/crtinit.o
+ .bss           0x000000000000088c        0x0 image/obj/startup/startup.o
+ .bss           0x000000000000088c        0x0 image/obj/startup/crti.o
+ .bss           0x000000000000088c        0x0 image/obj/startup/crtn.o
+ .bss           0x000000000000088c        0x0 image/obj/app/ctrl_app.o
+ .bss           0x000000000000088c        0x0 image/obj/app/main.o
+ .bss           0x000000000000088c        0x0 image/obj/app/work_app.o
+ .bss           0x000000000000088c        0x0 image/obj/driver/hibi/hibi.o
+ .bss           0x000000000000088c        0x0 image/obj/driver/hibi/remote_dma.o
+ .bss           0x000000000000088c        0x0 image/obj/driver/hibi/hibi_dma.o
+ .bss           0x000000000000088c        0x0 image/obj/driver/hibi/hibi_link.o
+ .bss           0x000000000000088c        0x0 image/obj/driver/hibi/hibi_pif.o
+ .bss           0x000000000000088c        0x8 image/obj/driver/cpu/cpu.o
+                0x000000000000088c                cpu_id
+ .bss           0x0000000000000894        0x0 image/obj/build_info.o
+ *(.bss.*)
+ *(.gnu.linkonce.b.*)
+ *(COMMON)
+                0x0000000000000894                . = ALIGN (0x4)
+                0x0000000000000894                PROVIDE (__bss_end, .)
+                0x0000000000000894                . = ALIGN (0x4)
+
+.heap           0x0000000000000894        0x0
+                0x0000000000000894                _heap = .
+                0x0000000000000894                _heap_start = .
+                0x0000000000000894                . = (. + _HEAP_SIZE)
+                0x0000000000000894                _heap_end = .
+                0x0000000000000894                . = ALIGN (0x4)
+
+.stack          0x0000000000000894      0x404
+                0x0000000000000894                _stack_end = .
+                0x0000000000000c94                . = (. + _STACK_SIZE)
+ *fill*         0x0000000000000894      0x400 
+                0x0000000000000c98                . = ALIGN (0x8)
+ *fill*         0x0000000000000c94        0x4 
+                0x0000000000000c98                _stack = .
+                0x0000000000000c98                _end = .
+
+.tdata
+ *(.tdata)
+ *(.tdata.*)
+ *(.gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss)
+ *(.tbss.*)
+ *(.gnu.linkonce.tb.*)
+OUTPUT(image/img/image.elf elf32-microblaze)
+
+Cross Reference Table
+
+Symbol                                            File
+GLOBAL_BUILD_DATE                                 image/obj/build_info.o
+GLOBAL_BUILD_TIME                                 image/obj/build_info.o
+HIBI_DMA_CFG0_OFFSET                              image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_CFG1_OFFSET                              image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_CTRL_OFFSET                              image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_HIBI_ADDR0_OFFSET                        image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_HIBI_ADDR1_OFFSET                        image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_MEM_ADDR0_OFFSET                         image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_MEM_ADDR1_OFFSET                         image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_STATUS_OFFSET                            image/obj/driver/hibi/hibi_link.o
+HIBI_DMA_TRIGGER_OFFSET                           image/obj/driver/hibi/hibi_link.o
+_SDA2_BASE_                                       image/obj/startup/startup.o
+_SDA_BASE_                                        image/obj/startup/startup.o
+__bss_end                                         image/obj/startup/crtinit.o
+__bss_start                                       image/obj/startup/crtinit.o
+__fini                                            image/obj/startup/crti.o
+                                                  image/obj/startup/crtinit.o
+__init                                            image/obj/startup/crti.o
+                                                  image/obj/startup/crtinit.o
+__sbss_end                                        image/obj/startup/crtinit.o
+__sbss_start                                      image/obj/startup/crtinit.o
+_crtinit                                          image/obj/startup/crtinit.o
+                                                  image/obj/startup/startup.o
+_exit                                             image/obj/startup/startup.o
+_stack                                            image/obj/startup/startup.o
+_start                                            image/obj/startup/startup.o
+_start1                                           image/obj/startup/startup.o
+cpu_id                                            image/obj/driver/cpu/cpu.o
+                                                  image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/app/main.o
+cpu_init                                          image/obj/driver/cpu/cpu.o
+                                                  image/obj/app/main.o
+ctrl_app                                          image/obj/app/ctrl_app.o
+hibi_dma_enable                                   image/obj/driver/hibi/hibi_dma.o
+                                                  image/obj/app/main.o
+hibi_dma_rec                                      image/obj/driver/hibi/hibi_dma.o
+hibi_dma_send                                     image/obj/driver/hibi/hibi_dma.o
+hibi_pif_fe                                       image/obj/driver/hibi/hibi_pif.o
+hibi_pif_le                                       image/obj/driver/hibi/hibi_pif.o
+hibi_pif_rxen                                     image/obj/driver/hibi/hibi_pif.o
+                                                  image/obj/app/ctrl_app.o
+hibi_pif_txcfg                                    image/obj/driver/hibi/hibi_pif.o
+hibi_pif_txen                                     image/obj/driver/hibi/hibi_pif.o
+hibi_read_prio_b                                  image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/driver/hibi/remote_dma.o
+hibi_recv_b                                       image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/driver/cpu/cpu.o
+hibi_rxmsg_channel                                image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/driver/hibi/remote_dma.o
+hibi_send_b                                       image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/driver/cpu/cpu.o
+hibi_send_prio_b                                  image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/driver/hibi/hibi_pif.o
+                                                  image/obj/driver/hibi/remote_dma.o
+hibi_table                                        image/obj/driver/hibi/hibi.o
+                                                  image/obj/driver/cpu/cpu.o
+                                                  image/obj/driver/hibi/hibi_pif.o
+                                                  image/obj/driver/hibi/hibi_link.o
+                                                  image/obj/app/ctrl_app.o
+hibi_txmsg_channel                                image/obj/driver/hibi/hibi_link.o
+init                                              image/obj/app/work_app.o
+main                                              image/obj/app/main.o
+                                                  image/obj/startup/crtinit.o
+remote_dma_chain                                  image/obj/driver/hibi/remote_dma.o
+remote_dma_enable                                 image/obj/driver/hibi/remote_dma.o
+                                                  image/obj/app/ctrl_app.o
+remote_dma_recv                                   image/obj/driver/hibi/remote_dma.o
+                                                  image/obj/app/ctrl_app.o
+remote_dma_rx_setup                               image/obj/driver/hibi/remote_dma.o
+remote_dma_send                                   image/obj/driver/hibi/remote_dma.o
+                                                  image/obj/app/ctrl_app.o
+remote_dma_start                                  image/obj/driver/hibi/remote_dma.o
+remote_dma_tx_setup                               image/obj/driver/hibi/remote_dma.o
+remote_dma_wait                                   image/obj/driver/hibi/remote_dma.o
+                                                  image/obj/app/ctrl_app.o
+sync_cpu                                          image/obj/driver/cpu/cpu.o
+work_app                                          image/obj/app/work_app.o

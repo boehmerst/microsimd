@@ -1,0 +1,13 @@
+image/obj/driver/hibi/remote_dma.o: src/driver/hibi/remote_dma.c \
+ src/driver/hibi/hibi.h src/tools/types.h src/driver/hibi/hibi_link.h \
+ src/driver/hibi/hibi_dma.h src/driver/hibi/remote_dma.h
+
+src/driver/hibi/hibi.h:
+
+src/tools/types.h:
+
+src/driver/hibi/hibi_link.h:
+
+src/driver/hibi/hibi_dma.h:
+
+src/driver/hibi/remote_dma.h:

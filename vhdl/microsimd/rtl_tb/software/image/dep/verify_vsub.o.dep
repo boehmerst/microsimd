@@ -1,0 +1,8 @@
+image/obj/app/verify_vsub.o: src/app/verify_vsub.c src/app/types.h \
+ src/app/vec_types.h src/app/vec_operands.h
+
+src/app/types.h:
+
+src/app/vec_types.h:
+
+src/app/vec_operands.h:
