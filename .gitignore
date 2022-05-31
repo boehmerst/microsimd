@@ -2,6 +2,8 @@
 ghdl.ini
 *.mk
 *.swp
+*.ghw
+*.gtkw
 build
 makefile
 archiv
