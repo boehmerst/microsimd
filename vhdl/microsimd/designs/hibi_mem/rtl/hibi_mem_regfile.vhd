@@ -23,16 +23,16 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library microsimd;
-use microsimd.hibi_mem_regif_types_pkg.all;
-use microsimd.hibi_mem_regfile_pkg.all;
+library work;
+use work.hibi_mem_regif_types_pkg.all;
+use work.hibi_mem_regfile_pkg.all;
 
 --pragma translate_off
 library std;
 use std.textio.all;
 
-library hibi;
-use hibi.txt_util.all;
+library work;
+use work.txt_util.all;
 --pragma translate_on
 
 entity hibi_mem_regfile is
@@ -72,9 +72,9 @@ architecture rtl of hibi_mem_regfile is
   signal HIBI_DMA_TRIGGER_MASK3 : hibi_mem_HIBI_DMA_TRIGGER_MASK3_rw_t;
 
 begin
--------------------------------------------------------------------------------
---  HIBI_DMA_CTRL write logic (internally located register)
--------------------------------------------------------------------------------
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_CTRL write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_CTRL_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -100,27 +100,34 @@ begin
     end if;
   end process HIBI_DMA_CTRL_rw;
   reg2logic_o.HIBI_DMA_CTRL.rw <= HIBI_DMA_CTRL;
-------------------------------------------------------------------------------
---  HIBI_DMA_TRIGGER logic (combinatorial only since extended xw, xr, xrw)
-------------------------------------------------------------------------------
-  HIBI_DMA_TRIGGER_c: process(gif_req_i.addr, gif_req_i.wr, gif_req_i.rd, gif_req_i.wdata) is
-  begin
-    reg2logic_o.HIBI_DMA_TRIGGER.c.wr <= '0';
-    reg2logic_o.HIBI_DMA_TRIGGER.c.rd <= '0';
 
-    if(gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_slv_c) then
-      reg2logic_o.HIBI_DMA_TRIGGER.c.wr <= gif_req_i.wr;
-      reg2logic_o.HIBI_DMA_TRIGGER.c.rd <= gif_req_i.rd;
-    end if;
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_CTRL access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_CTRL.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_CTRL_slv_c else '0';
+  reg2logic_o.HIBI_DMA_CTRL.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_CTRL_slv_c else '0';
 
-    reg2logic_o.HIBI_DMA_TRIGGER.xw.start0 <= gif_req_i.wdata(0);
-    reg2logic_o.HIBI_DMA_TRIGGER.xw.start1 <= gif_req_i.wdata(1);
-    reg2logic_o.HIBI_DMA_TRIGGER.xw.start2 <= gif_req_i.wdata(2);
-    reg2logic_o.HIBI_DMA_TRIGGER.xw.start3 <= gif_req_i.wdata(3);
-  end process HIBI_DMA_TRIGGER_c;
--------------------------------------------------------------------------------
---  HIBI_DMA_CFG0 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_STATUS access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_STATUS.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_STATUS_slv_c else '0';
+  reg2logic_o.HIBI_DMA_STATUS.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_STATUS_slv_c else '0';
+
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_TRIGGER access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_TRIGGER.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER.xw.start0 <= gif_req_i.wdata(0);
+  reg2logic_o.HIBI_DMA_TRIGGER.xw.start1 <= gif_req_i.wdata(1);
+  reg2logic_o.HIBI_DMA_TRIGGER.xw.start2 <= gif_req_i.wdata(2);
+  reg2logic_o.HIBI_DMA_TRIGGER.xw.start3 <= gif_req_i.wdata(3);
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_CFG0 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_CFG0_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -158,9 +165,16 @@ begin
     end if;
   end process HIBI_DMA_CFG0_rw;
   reg2logic_o.HIBI_DMA_CFG0.rw <= HIBI_DMA_CFG0;
--------------------------------------------------------------------------------
---  HIBI_DMA_MEM_ADDR0 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_CFG0 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_CFG0.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_CFG0_slv_c else '0';
+  reg2logic_o.HIBI_DMA_CFG0.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_CFG0_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_MEM_ADDR0 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_MEM_ADDR0_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -170,7 +184,7 @@ begin
       HIBI_DMA_MEM_ADDR0 <= dflt_hibi_mem_HIBI_DMA_MEM_ADDR0_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR0_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR0.addr <= gif_req_i.wdata(17 downto 0);
+        HIBI_DMA_MEM_ADDR0.addr <= gif_req_i.wdata(9 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -178,7 +192,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR0 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(17 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(9 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -186,9 +200,16 @@ begin
     end if;
   end process HIBI_DMA_MEM_ADDR0_rw;
   reg2logic_o.HIBI_DMA_MEM_ADDR0.rw <= HIBI_DMA_MEM_ADDR0;
--------------------------------------------------------------------------------
---  HIBI_DMA_HIBI_ADDR0 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_MEM_ADDR0 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_MEM_ADDR0.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR0_slv_c else '0';
+  reg2logic_o.HIBI_DMA_MEM_ADDR0.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR0_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_HIBI_ADDR0 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_HIBI_ADDR0_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -214,9 +235,16 @@ begin
     end if;
   end process HIBI_DMA_HIBI_ADDR0_rw;
   reg2logic_o.HIBI_DMA_HIBI_ADDR0.rw <= HIBI_DMA_HIBI_ADDR0;
--------------------------------------------------------------------------------
---  HIBI_DMA_TRIGGER_MASK0 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_HIBI_ADDR0 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_HIBI_ADDR0.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c else '0';
+  reg2logic_o.HIBI_DMA_HIBI_ADDR0.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_TRIGGER_MASK0 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_TRIGGER_MASK0_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -242,9 +270,16 @@ begin
     end if;
   end process HIBI_DMA_TRIGGER_MASK0_rw;
   reg2logic_o.HIBI_DMA_TRIGGER_MASK0.rw <= HIBI_DMA_TRIGGER_MASK0;
--------------------------------------------------------------------------------
---  HIBI_DMA_CFG1 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_TRIGGER_MASK0 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK0.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK0_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK0.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK0_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_CFG1 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_CFG1_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -282,9 +317,16 @@ begin
     end if;
   end process HIBI_DMA_CFG1_rw;
   reg2logic_o.HIBI_DMA_CFG1.rw <= HIBI_DMA_CFG1;
--------------------------------------------------------------------------------
---  HIBI_DMA_MEM_ADDR1 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_CFG1 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_CFG1.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_CFG1_slv_c else '0';
+  reg2logic_o.HIBI_DMA_CFG1.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_CFG1_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_MEM_ADDR1 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_MEM_ADDR1_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -294,7 +336,7 @@ begin
       HIBI_DMA_MEM_ADDR1 <= dflt_hibi_mem_HIBI_DMA_MEM_ADDR1_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR1_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR1.addr <= gif_req_i.wdata(17 downto 0);
+        HIBI_DMA_MEM_ADDR1.addr <= gif_req_i.wdata(9 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -302,7 +344,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR1 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(17 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(9 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -310,9 +352,16 @@ begin
     end if;
   end process HIBI_DMA_MEM_ADDR1_rw;
   reg2logic_o.HIBI_DMA_MEM_ADDR1.rw <= HIBI_DMA_MEM_ADDR1;
--------------------------------------------------------------------------------
---  HIBI_DMA_HIBI_ADDR1 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_MEM_ADDR1 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_MEM_ADDR1.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR1_slv_c else '0';
+  reg2logic_o.HIBI_DMA_MEM_ADDR1.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR1_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_HIBI_ADDR1 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_HIBI_ADDR1_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -338,9 +387,16 @@ begin
     end if;
   end process HIBI_DMA_HIBI_ADDR1_rw;
   reg2logic_o.HIBI_DMA_HIBI_ADDR1.rw <= HIBI_DMA_HIBI_ADDR1;
--------------------------------------------------------------------------------
---  HIBI_DMA_TRIGGER_MASK1 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_HIBI_ADDR1 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_HIBI_ADDR1.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c else '0';
+  reg2logic_o.HIBI_DMA_HIBI_ADDR1.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_TRIGGER_MASK1 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_TRIGGER_MASK1_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -366,9 +422,16 @@ begin
     end if;
   end process HIBI_DMA_TRIGGER_MASK1_rw;
   reg2logic_o.HIBI_DMA_TRIGGER_MASK1.rw <= HIBI_DMA_TRIGGER_MASK1;
--------------------------------------------------------------------------------
---  HIBI_DMA_CFG2 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_TRIGGER_MASK1 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK1.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK1_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK1.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK1_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_CFG2 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_CFG2_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -406,9 +469,16 @@ begin
     end if;
   end process HIBI_DMA_CFG2_rw;
   reg2logic_o.HIBI_DMA_CFG2.rw <= HIBI_DMA_CFG2;
--------------------------------------------------------------------------------
---  HIBI_DMA_MEM_ADDR2 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_CFG2 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_CFG2.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_CFG2_slv_c else '0';
+  reg2logic_o.HIBI_DMA_CFG2.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_CFG2_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_MEM_ADDR2 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_MEM_ADDR2_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -418,7 +488,7 @@ begin
       HIBI_DMA_MEM_ADDR2 <= dflt_hibi_mem_HIBI_DMA_MEM_ADDR2_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR2_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR2.addr <= gif_req_i.wdata(17 downto 0);
+        HIBI_DMA_MEM_ADDR2.addr <= gif_req_i.wdata(9 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -426,7 +496,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR2 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(17 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(9 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -434,9 +504,16 @@ begin
     end if;
   end process HIBI_DMA_MEM_ADDR2_rw;
   reg2logic_o.HIBI_DMA_MEM_ADDR2.rw <= HIBI_DMA_MEM_ADDR2;
--------------------------------------------------------------------------------
---  HIBI_DMA_HIBI_ADDR2 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_MEM_ADDR2 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_MEM_ADDR2.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR2_slv_c else '0';
+  reg2logic_o.HIBI_DMA_MEM_ADDR2.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR2_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_HIBI_ADDR2 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_HIBI_ADDR2_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -462,9 +539,16 @@ begin
     end if;
   end process HIBI_DMA_HIBI_ADDR2_rw;
   reg2logic_o.HIBI_DMA_HIBI_ADDR2.rw <= HIBI_DMA_HIBI_ADDR2;
--------------------------------------------------------------------------------
---  HIBI_DMA_TRIGGER_MASK2 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_HIBI_ADDR2 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_HIBI_ADDR2.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR2_slv_c else '0';
+  reg2logic_o.HIBI_DMA_HIBI_ADDR2.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR2_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_TRIGGER_MASK2 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_TRIGGER_MASK2_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -490,9 +574,16 @@ begin
     end if;
   end process HIBI_DMA_TRIGGER_MASK2_rw;
   reg2logic_o.HIBI_DMA_TRIGGER_MASK2.rw <= HIBI_DMA_TRIGGER_MASK2;
--------------------------------------------------------------------------------
---  HIBI_DMA_CFG3 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_TRIGGER_MASK2 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK2.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK2_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK2.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK2_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_CFG3 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_CFG3_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -530,9 +621,16 @@ begin
     end if;
   end process HIBI_DMA_CFG3_rw;
   reg2logic_o.HIBI_DMA_CFG3.rw <= HIBI_DMA_CFG3;
--------------------------------------------------------------------------------
---  HIBI_DMA_MEM_ADDR3 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_CFG3 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_CFG3.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_CFG3_slv_c else '0';
+  reg2logic_o.HIBI_DMA_CFG3.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_CFG3_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_MEM_ADDR3 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_MEM_ADDR3_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -542,7 +640,7 @@ begin
       HIBI_DMA_MEM_ADDR3 <= dflt_hibi_mem_HIBI_DMA_MEM_ADDR3_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR3_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR3.addr <= gif_req_i.wdata(17 downto 0);
+        HIBI_DMA_MEM_ADDR3.addr <= gif_req_i.wdata(9 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -550,7 +648,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR3 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(17 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(9 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -558,9 +656,16 @@ begin
     end if;
   end process HIBI_DMA_MEM_ADDR3_rw;
   reg2logic_o.HIBI_DMA_MEM_ADDR3.rw <= HIBI_DMA_MEM_ADDR3;
--------------------------------------------------------------------------------
---  HIBI_DMA_HIBI_ADDR3 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_MEM_ADDR3 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_MEM_ADDR3.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR3_slv_c else '0';
+  reg2logic_o.HIBI_DMA_MEM_ADDR3.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR3_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_HIBI_ADDR3 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_HIBI_ADDR3_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -586,9 +691,16 @@ begin
     end if;
   end process HIBI_DMA_HIBI_ADDR3_rw;
   reg2logic_o.HIBI_DMA_HIBI_ADDR3.rw <= HIBI_DMA_HIBI_ADDR3;
--------------------------------------------------------------------------------
---  HIBI_DMA_TRIGGER_MASK3 write logic (internally located register)
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_HIBI_ADDR3 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_HIBI_ADDR3.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR3_slv_c else '0';
+  reg2logic_o.HIBI_DMA_HIBI_ADDR3.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_HIBI_ADDR3_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  --  HIBI_DMA_TRIGGER_MASK3 write logic (internally located register)
+  -------------------------------------------------------------------------------
   HIBI_DMA_TRIGGER_MASK3_rw: process(clk_i, reset_n_i) is
 --pragma translate_off
     variable wr : line;
@@ -614,9 +726,16 @@ begin
     end if;
   end process HIBI_DMA_TRIGGER_MASK3_rw;
   reg2logic_o.HIBI_DMA_TRIGGER_MASK3.rw <= HIBI_DMA_TRIGGER_MASK3;
--------------------------------------------------------------------------------
--- read logic
--------------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------------
+  -- HIBI_DMA_TRIGGER_MASK3 access control decoding
+  -------------------------------------------------------------------------------
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK3.c.wr <= gif_req_i.wr when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK3_slv_c else '0';
+  reg2logic_o.HIBI_DMA_TRIGGER_MASK3.c.rd <= gif_req_i.rd when gif_req_i.addr = addr_offset_HIBI_DMA_TRIGGER_MASK3_slv_c else '0';
+
+  -------------------------------------------------------------------------------
+  -- read logic
+  -------------------------------------------------------------------------------
   read: process(clk_i, reset_n_i) is
   begin
     if(reset_n_i = '0') then
@@ -650,7 +769,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG0.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR0_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(17 downto 0) <= HIBI_DMA_MEM_ADDR0.addr;
+            gif_rsp_o.rdata(9 downto 0) <= HIBI_DMA_MEM_ADDR0.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR0.addr;
@@ -665,7 +784,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG1.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR1_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(17 downto 0) <= HIBI_DMA_MEM_ADDR1.addr;
+            gif_rsp_o.rdata(9 downto 0) <= HIBI_DMA_MEM_ADDR1.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR1.addr;
@@ -680,7 +799,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG2.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR2_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(17 downto 0) <= HIBI_DMA_MEM_ADDR2.addr;
+            gif_rsp_o.rdata(9 downto 0) <= HIBI_DMA_MEM_ADDR2.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR2_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR2.addr;
@@ -695,7 +814,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG3.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR3_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(17 downto 0) <= HIBI_DMA_MEM_ADDR3.addr;
+            gif_rsp_o.rdata(9 downto 0) <= HIBI_DMA_MEM_ADDR3.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR3_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR3.addr;

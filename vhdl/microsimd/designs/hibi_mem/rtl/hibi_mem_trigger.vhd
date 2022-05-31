@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_mem_trigger.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -107,11 +107,11 @@ begin
                           v.state   := triggered;
                           v.start   := '1';
                         end if;
-      
+
       when triggered => if(busy_i = '1') then
                           v.state := running;
                         end if;
-      
+
       when running   => if(busy_i = '0') then
                           v.state   := idle;
                           v.trigger := '1';

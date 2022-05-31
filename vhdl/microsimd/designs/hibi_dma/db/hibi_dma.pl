@@ -3,7 +3,7 @@
 #-- Project    :
 #-------------------------------------------------------------------------------
 #-- File       : hibi_dma.pl
-#-- Author     : boehmers
+#-- Author     : deboehse
 #-- Company    : private
 #-- Created    : 
 #-- Last update: 
@@ -57,7 +57,7 @@ my $ref_trig = {
 };
 
 my $ref_cfg0 = {
-  offset => 0x04,
+  offset => 0x03,
   name   => 'HIBI_DMA_CFG0',
   desc   => 'configuration register',
   fld    => [
@@ -69,7 +69,7 @@ my $ref_cfg0 = {
 };
 
 my $ref_dma_addr0 = {
-  offset => 0x05,
+  offset => 0x04,
   name   => 'HIBI_DMA_MEM_ADDR0',
   desc   => 'memory address',
   fld    => [
@@ -78,7 +78,7 @@ my $ref_dma_addr0 = {
 };
 
 my $ref_hibi_addr0 = {
-  offset => 0x06,
+  offset => 0x05,
   name   => 'HIBI_DMA_HIBI_ADDR0',
   desc   => 'hibi address',
   fld    => [
@@ -87,7 +87,7 @@ my $ref_hibi_addr0 = {
 };
 
 my $ref_trig_mask0 = {
-  offset => 0x07,
+  offset => 0x06,
   name   => 'HIBI_DMA_TRIGGER_MASK0',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -96,7 +96,7 @@ my $ref_trig_mask0 = {
 };
 
 my $ref_cfg1 = {
-  offset => 0x08,
+  offset => 0x07,
   name   => 'HIBI_DMA_CFG1',
   desc   => 'configuration register',
   fld    => [
@@ -108,7 +108,7 @@ my $ref_cfg1 = {
 };
 
 my $ref_dma_addr1 = {
-  offset => 0x09,
+  offset => 0x08,
   name   => 'HIBI_DMA_MEM_ADDR1',
   desc   => 'memory address',
   fld    => [
@@ -117,7 +117,7 @@ my $ref_dma_addr1 = {
 };
 
 my $ref_hibi_addr1 = {
-  offset => 0x0a,
+  offset => 0x09,
   name   => 'HIBI_DMA_HIBI_ADDR1',
   desc   => 'hibi address',
   fld    => [
@@ -126,7 +126,7 @@ my $ref_hibi_addr1 = {
 };
 
 my $ref_trig_mask1 = {
-  offset => 0x0b,
+  offset => 0x0a,
   name   => 'HIBI_DMA_TRIGGER_MASK1',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -135,7 +135,7 @@ my $ref_trig_mask1 = {
 };
 
 my $ref_cfg2 = {
-  offset => 0x0c,
+  offset => 0x0b,
   name   => 'HIBI_DMA_CFG2',
   desc   => 'configuration register',
   fld    => [
@@ -147,7 +147,7 @@ my $ref_cfg2 = {
 };
 
 my $ref_dma_addr2 = {
-  offset => 0x0d,
+  offset => 0x0c,
   name   => 'HIBI_DMA_MEM_ADDR2',
   desc   => 'memory address',
   fld    => [
@@ -156,7 +156,7 @@ my $ref_dma_addr2 = {
 };
 
 my $ref_hibi_addr2 = {
-  offset => 0x0e,
+  offset => 0x0d,
   name   => 'HIBI_DMA_HIBI_ADDR2',
   desc   => 'hibi address',
   fld    => [
@@ -165,7 +165,7 @@ my $ref_hibi_addr2 = {
 };
 
 my $ref_trig_mask2 = {
-  offset => 0x0f,
+  offset => 0x0e,
   name   => 'HIBI_DMA_TRIGGER_MASK2',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -174,7 +174,7 @@ my $ref_trig_mask2 = {
 };
 
 my $ref_cfg3 = {
-  offset => 0x10,
+  offset => 0x0f,
   name   => 'HIBI_DMA_CFG3',
   desc   => 'configuration register',
   fld    => [
@@ -186,7 +186,7 @@ my $ref_cfg3 = {
 };
 
 my $ref_dma_addr3 = {
-  offset => 0x11,
+  offset => 0x10,
   name   => 'HIBI_DMA_MEM_ADDR3',
   desc   => 'memory address',
   fld    => [
@@ -195,7 +195,7 @@ my $ref_dma_addr3 = {
 };
 
 my $ref_hibi_addr3 = {
-  offset => 0x12,
+  offset => 0x11,
   name   => 'HIBI_DMA_HIBI_ADDR3',
   desc   => 'hibi address',
   fld    => [
@@ -204,11 +204,61 @@ my $ref_hibi_addr3 = {
 };
 
 my $ref_trig_mask3 = {
-  offset => 0x13,
+  offset => 0x12,
   name   => 'HIBI_DMA_TRIGGER_MASK3',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
     { name => 'mask',    slc => [0, 3],  type => 'rw',  rst => 0x00,  desc => 'trigger mask'},
+  ]
+};
+
+my $ref_gpio = {
+  offset =>  0x13,
+  name  => 'HIBI_DMA_GPIO',
+  desc  => 'general purpose I/O',
+  fld   => [
+    { name => 'GPIO_0',    slc => [ 0,  0], type => 'xrw', rst => 0x00, desc => 'GPIO0'},
+    { name => 'GPIO_1',    slc => [ 1,  1], type => 'xrw', rst => 0x00, desc => 'GPIO1'},
+    { name => 'GPIO_2',    slc => [ 2,  2], type => 'xrw', rst => 0x00, desc => 'GPIO2'},
+    { name => 'GPIO_3',    slc => [ 3,  3], type => 'xrw', rst => 0x00, desc => 'GPIO3'},
+    { name => 'GPIO_4',    slc => [ 4,  4], type => 'xrw', rst => 0x00, desc => 'GPIO4'},
+    { name => 'GPIO_5',    slc => [ 5,  5], type => 'xrw', rst => 0x00, desc => 'GPIO5'},
+    { name => 'GPIO_6',    slc => [ 6,  6], type => 'xrw', rst => 0x00, desc => 'GPIO6'},
+    { name => 'GPIO_7',    slc => [ 7,  7], type => 'xrw', rst => 0x00, desc => 'GPIO7'},
+    { name => 'GPIO_8',    slc => [ 8,  8], type => 'xrw', rst => 0x00, desc => 'GPIO8'},
+    { name => 'GPIO_9',    slc => [ 9,  9], type => 'xrw', rst => 0x00, desc => 'GPIO9'},
+    { name => 'GPIO_A',    slc => [10, 10], type => 'xrw', rst => 0x00, desc => 'GPIOA'},
+    { name => 'GPIO_B',    slc => [11, 11], type => 'xrw', rst => 0x00, desc => 'GPIOB'},
+    { name => 'GPIO_C',    slc => [12, 12], type => 'xrw', rst => 0x00, desc => 'GPIOC'},
+    { name => 'GPIO_D',    slc => [13, 13], type => 'xrw', rst => 0x00, desc => 'GPIOD'},
+    { name => 'GPIO_E',    slc => [14, 14], type => 'xrw', rst => 0x00, desc => 'GPIOE'},
+    { name => 'GPIO_F',    slc => [15, 15], type => 'xrw', rst => 0x00, desc => 'GPIOF'},
+
+  ]
+};
+
+my $ref_gpio_dir = {
+  offset => 0x14,
+  name  => 'HIBI_DMA_GPIO_DIR',
+  desc  => 'general purpose I/O',
+  fld   => [
+    { name => 'GPIO_0',    slc => [ 0,  0], type => 'rw', rst => 0x00, desc => 'GPIO0'},
+    { name => 'GPIO_1',    slc => [ 1,  1], type => 'rw', rst => 0x00, desc => 'GPIO1'},
+    { name => 'GPIO_2',    slc => [ 2,  2], type => 'rw', rst => 0x00, desc => 'GPIO2'},
+    { name => 'GPIO_3',    slc => [ 3,  3], type => 'rw', rst => 0x00, desc => 'GPIO3'},
+    { name => 'GPIO_4',    slc => [ 4,  4], type => 'rw', rst => 0x00, desc => 'GPIO4'},
+    { name => 'GPIO_5',    slc => [ 5,  5], type => 'rw', rst => 0x00, desc => 'GPIO5'},
+    { name => 'GPIO_6',    slc => [ 6,  6], type => 'rw', rst => 0x00, desc => 'GPIO6'},
+    { name => 'GPIO_7',    slc => [ 7,  7], type => 'rw', rst => 0x00, desc => 'GPIO7'},
+    { name => 'GPIO_8',    slc => [ 8,  8], type => 'rw', rst => 0x00, desc => 'GPIO8'},
+    { name => 'GPIO_9',    slc => [ 9,  9], type => 'rw', rst => 0x00, desc => 'GPIO9'},
+    { name => 'GPIO_A',    slc => [10, 10], type => 'rw', rst => 0x00, desc => 'GPIOA'},
+    { name => 'GPIO_B',    slc => [11, 11], type => 'rw', rst => 0x00, desc => 'GPIOB'},
+    { name => 'GPIO_C',    slc => [12, 12], type => 'rw', rst => 0x00, desc => 'GPIOC'},
+    { name => 'GPIO_D',    slc => [13, 13], type => 'rw', rst => 0x00, desc => 'GPIOD'},
+    { name => 'GPIO_E',    slc => [14, 14], type => 'rw', rst => 0x00, desc => 'GPIOE'},
+    { name => 'GPIO_F',    slc => [15, 15], type => 'rw', rst => 0x00, desc => 'GPIOF'},
+
   ]
 };
 
@@ -232,5 +282,7 @@ my $descriptor = [
   $ref_dma_addr3,
   $ref_hibi_addr3,
   $ref_trig_mask3,
+  $ref_gpio,
+  $ref_gpio_dir,
 ];
 

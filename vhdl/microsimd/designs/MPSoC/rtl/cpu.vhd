@@ -14,9 +14,12 @@ entity cpu is
   port (
     clk_i             : in  std_ulogic;
     reset_n_i         : in  std_ulogic;
-    en_i              : in  std_ulogic;
-    init_i            : in  std_ulogic;
+    hart_id_i         : in  std_ulogic_vector(15 downto 0);
+    core_en_i         : in  std_ulogic;
+    core_init_i       : in  std_ulogic;
     irq_i             : in  std_ulogic;
+    agent_en_i        : in  std_ulogic;
+    agent_init_i      : in  std_ulogic;
     agent_txreq_o     : out agent_txreq_t;
     agent_txrsp_i     : in  agent_txrsp_t;
     agent_rxreq_o     : out agent_rxreq_t;
@@ -31,8 +34,8 @@ end entity cpu;
 architecture rtl of cpu is
   
   -- TODO: derive from CFG_DMEM_SIZE / CFG_IMEM_SIZE
-  constant rom_size_c            : integer   := 16;
-  constant ram_size_c            : integer   := 16;
+  constant rom_size_c            : integer   := 10;
+  constant ram_size_c            : integer   := 10;
   
   constant nr_slv_c              : integer   := 3;
   constant nr_mst_c              : integer   := 3;
@@ -70,7 +73,7 @@ begin
   imem.dat     <= xbari0_mst_rsp(xbar_mst_t'pos(imst)).rdata;
   dmem.scu.dat <= xbari0_mst_rsp(xbar_mst_t'pos(dmst)).rdata;
   dmem.simd    <= dflt_vec_dmem_in_c;        -- since we use internal LSU
-  wait_n       <= not xbari0_wait_req;
+  wait_n       <= not xbari0_wait_req and core_en_i;
   
   corei0: entity microsimd.core
     generic map (
@@ -82,8 +85,8 @@ begin
     port map (
       clk_i            => clk_i,                       
       reset_n_i        => reset_n_i,
-      init_i           => '0',
-      irq_i            => '0',
+      init_i           => core_init_i,
+      irq_i            => irq_i,
       wait_n_i         => wait_n,
       imem_o           => corei0_imem,
       imem_i           => imem,
@@ -106,11 +109,12 @@ begin
     port map (
       clk_i             => clk_i,
       reset_n_i         => reset_n_i,
-      en_i              => '1',
-      init_i            => '0',
+      en_i              => agent_en_i,
+      init_i            => agent_init_i,
+      gpio_i            => hart_id_i,
       fsl_sel_i         => corei0_fsl_sel(fsl_slave_t'pos(hibi_dma_fsl)),
       fsl_req_i         => corei0_fsl_req,
-      fsl_rsp_o         => hibi_dmai0_fsl_rsp,      
+      fsl_rsp_o         => hibi_dmai0_fsl_rsp,    
       mem_req_o         => hibi_dmai0_mem_req,
       mem_rsp_i         => dma_mem_rsp,
       mem_wait_i        => xbari0_wait_req,
@@ -128,7 +132,7 @@ begin
   -- memory xbar (vector memory transfers handled and serialized by core LSU)
   ------------------------------------------------------------------------------
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.addr <= corei0_imem.adr;
-  xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.sel  <= (others=>'1');
+  xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.sel  <= (others => '1');
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.wr   <= '0';
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.en   <= corei0_imem.ena;
   xbar_mst_req(xbar_mst_t'pos(imst)).wdata     <= (others=>'0');
@@ -154,8 +158,8 @@ begin
     port map (
       clk_i          => clk_i,
       reset_n_i      => reset_n_i,
-      en_i           => '1',
-      init_i         => '0',
+      en_i           => agent_en_i,
+      init_i         => agent_init_i,
       xbar_mst_req_i => xbar_mst_req,
       xbar_mst_rsp_o => xbari0_mst_rsp,
       xbar_slv_rsp_i => xbar_slv_rsp,
@@ -176,16 +180,16 @@ begin
 
     memi0 : entity microsimd.sram_4en
       generic map (
-        width_g => CFG_DMEM_WIDTH,
-        size_g  => ram_size_c-2
+        data_width_g => CFG_DMEM_WIDTH,
+        addr_width_g  => ram_size_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => mem_en,
-        adr_i => xbari0_slv_req(0).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i => xbari0_slv_req(0).wdata,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => mem_en,
+        addr_i => xbari0_slv_req(0).ctrl.addr(ram_size_c-1 downto 2),
+        dat_i  => xbari0_slv_req(0).wdata,
+        dat_o  => mem_dat
       );
     
      xbar_slv_rsp(0).rdata <= mem_dat;
@@ -204,16 +208,16 @@ begin
 
     memi0 : entity microsimd.sram_4en
       generic map (
-        width_g => CFG_DMEM_WIDTH,
-        size_g  => ram_size_c-2
+        data_width_g => CFG_DMEM_WIDTH,
+        addr_width_g => ram_size_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => mem_en,
-        adr_i => xbari0_slv_req(1).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i => xbari0_slv_req(1).wdata,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => mem_en,
+        addr_i => xbari0_slv_req(1).ctrl.addr(ram_size_c-1 downto 2),
+        dat_i  => xbari0_slv_req(1).wdata,
+        dat_o  => mem_dat
       );
     
      xbar_slv_rsp(1).rdata <= mem_dat;
@@ -232,16 +236,16 @@ begin
 
     memi0 : entity microsimd.sram_4en
       generic map (
-        width_g => CFG_DMEM_WIDTH,
-        size_g  => ram_size_c-2
+        data_width_g => CFG_DMEM_WIDTH,
+        addr_width_g => ram_size_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => mem_en,
-        adr_i => xbari0_slv_req(2).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i => xbari0_slv_req(2).wdata,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => mem_en,
+        addr_i => xbari0_slv_req(2).ctrl.addr(ram_size_c-1 downto 2),
+        dat_i  => xbari0_slv_req(2).wdata,
+        dat_o  => mem_dat
       );
     
      xbar_slv_rsp(2).rdata <= mem_dat;

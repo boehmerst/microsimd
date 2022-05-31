@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
--- Title      : hibi_dma
+-- Title      : hibi_dma_gif_mux
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_dma_gif_mux.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -23,8 +23,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library microsimd;
-use microsimd.hibi_dma_regif_types_pkg.all;
+library work;
+use work.hibi_dma_regif_types_pkg.all;
 
 entity hibi_dma_gif_mux is
   port (
@@ -46,10 +46,12 @@ architecture rtl of hibi_dma_gif_mux is
   type reg_t is record
     state   : std_ulogic;
     mux_sel : std_ulogic;
+    m1_req  : hibi_dma_gif_req_t;
   end record reg_t;
   constant dflt_reg_c : reg_t :=(
     state   => '0',
-    mux_sel => '0'
+    mux_sel => '0',
+    m1_req  => dflt_hibi_dma_gif_req_c
   );
 
   signal r, rin : reg_t;
@@ -68,11 +70,17 @@ begin
     m0_req_en := m0_gif_req_i.rd or m0_gif_req_i.wr;
     m1_req_en := m1_gif_req_i.rd or m1_gif_req_i.wr;
 
+    -- NOTE: conditionally register m1 request, we do not reset the register
+    --       because the output mux defaults to m0
+    if m1_req_en = '1' then
+      v.m1_req := m1_gif_req_i;
+    end if;
+
     ----------------------------------------------------------------------------
     -- this is a simplified mux that strictely assumes the slave to respond
     -- in the following clock cycle
     -- master zero is served first in case of competing requests
-    -- master one is expected to hold its request active while being stalled
+    -- master one request gets registered 
     ----------------------------------------------------------------------------
     case v.state is
       when '0'    => v.mux_sel   := '0';
@@ -95,7 +103,7 @@ begin
     rin <= v;
   end process comb0;
 
-  mux_gif_req_o      <= m0_gif_req_i when rin.mux_sel = '0' else  m1_gif_req_i;
+  mux_gif_req_o      <= m0_gif_req_i when rin.mux_sel = '0' else rin.m1_req;
 
   m0_gif_rsp_o.rdata <= mux_gif_rsp_i.rdata;
   m1_gif_rsp_o.rdata <= mux_gif_rsp_i.rdata;
@@ -122,4 +130,3 @@ begin
   end process sync0;
 
 end architecture rtl;
-

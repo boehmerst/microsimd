@@ -13,12 +13,12 @@ entity sram_2en is
     size_g  : positive := 16
   );
   port (
-    clk_i : in  std_ulogic;
-    wre_i : in  std_ulogic_vector(1 downto 0);     
-    ena_i : in  std_ulogic;
-    adr_i : in  std_ulogic_vector(size_g-1 downto 0);
-    dat_i : in  std_ulogic_vector(width_g-1 downto 0);
-    dat_o : out std_ulogic_vector(width_g-1 downto 0)
+    clk_i  : in  std_ulogic;
+    wre_i  : in  std_ulogic_vector(1 downto 0);     
+    ena_i  : in  std_ulogic;
+    addr_i : in  std_ulogic_vector(size_g-1 downto 0);
+    dat_i  : in  std_ulogic_vector(width_g-1 downto 0);
+    dat_o  : out std_ulogic_vector(width_g-1 downto 0) := (others=>'0')
   );
 end sram_2en;
 
@@ -28,21 +28,21 @@ end sram_2en;
 architecture beh of sram_2en is
 
   type ram_t is array(2**size_g-1 downto 0) of std_ulogic_vector(width_g-1 downto 0);
-  type sel_t is array(width_g/2-1 downto 0) of std_ulogic_vector(width_g/2-1 downto 0);
+  type sel_t is array(width_g/32-1 downto 0) of std_ulogic_vector(width_g/2-1 downto 0);
 
-  signal ram : ram_t;
-  signal di  : sel_t;
+  signal ram : ram_t := (others => (others => '0'));
+  signal di  : sel_t := (others => (others => '0'));
   
 begin
-  process(wre_i, dat_i, adr_i)
+  process(wre_i, dat_i, addr_i)
   begin
     if wre_i(0) = '1' then
       di(0) <= dat_i(width_g/2-1 downto 0);
     else
 -- pragma translate_off
-      if(notx(adr_i)) then
+      if(notx(addr_i)) then
 -- pragma translate_on
-        di(0) <= ram(to_integer(unsigned(adr_i)))(width_g/2-1 downto 0);
+        di(0) <= ram(to_integer(unsigned(addr_i)))(width_g/2-1 downto 0);
 -- pragma translate_off
       else
         di(0) <= (others=>'X'); -- let undefined state propagate without complaning about
@@ -54,9 +54,9 @@ begin
       di(1) <= dat_i(width_g-1 downto width_g/2);
     else
 -- pragma translate_off
-      if(notx(adr_i)) then
+      if(notx(addr_i)) then
 -- pragma translate_on
-        di(1) <= ram(to_integer(unsigned(adr_i)))(width_g-1 downto width_g/2);
+        di(1) <= ram(to_integer(unsigned(addr_i)))(width_g-1 downto width_g/2);
 -- pragma translate_off
       else
         di(1) <= (others=>'X'); -- let undefined state propagate without complaning about
@@ -69,8 +69,8 @@ begin
   begin
     if rising_edge(clk_i) then
       if ena_i = '1' then
-        ram(to_integer(unsigned(adr_i))) <= di(1) & di(0);
-        dat_o                            <= di(1) & di(0);
+        ram(to_integer(unsigned(addr_i))) <= di(1) & di(0);
+        dat_o                             <= di(1) & di(0);
       end if;
     end if;
   end process;

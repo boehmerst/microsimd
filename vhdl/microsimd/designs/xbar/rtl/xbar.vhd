@@ -36,6 +36,7 @@ architecture rtl of xbar is
     variable addr_sel : std_ulogic_vector(nr_slv_g-1 downto 0);
   begin
     sel_bin         := addr(log2ceil(nr_slv_g)+log2_wsize_g-1 downto log2_wsize_g);
+
     slv0: for i in 0 to nr_slv_g-1 loop
       if(sel_bin = std_ulogic_vector(to_unsigned(i, sel_bin'length))) then
         addr_sel(i) := '1';
@@ -43,6 +44,7 @@ architecture rtl of xbar is
         addr_sel(i) := '0';
       end if;
     end loop slv0;
+
     return addr_sel;
   end function addr_decode;
 
@@ -159,7 +161,7 @@ begin
         slv_sel(i)    := addr_decode(xbar_mst_req_mux(i).ctrl.addr);
       end if;
       mst_req0: for j in 0 to nr_slv_g-1 loop
-        mst_req(j)(i) := slv_sel(i)(j);
+       mst_req(j)(i) := slv_sel(i)(j);
       end loop mst_req0;
     end loop slv_sel0;
 

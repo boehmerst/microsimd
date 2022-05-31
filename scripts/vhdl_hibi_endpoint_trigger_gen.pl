@@ -9,18 +9,18 @@ my $user      = $ENV{'USER'};
 my $host      = $ENV{'HOSTNAME'};
 
 my $entity   = "hibi_dma";
-my $channels = 4;
+#my $channels = 4;
 
 # command line options table
 my %option = 
   ( 'entity'   => { 'string' => 'entity|e=s',    'ref' => \$entity,    'help' => 'Specify entity name'        },
-    'channels' => { 'string' => 'channels|ch=i', 'ref' => \$channels,  'help' => 'Specify number of channels' },    
+#    'channels' => { 'string' => 'channels|ch=i', 'ref' => \$channels,  'help' => 'Specify number of channels' },    
     'help'     => { 'string' => 'help|?',        'ref' => \&help,      'help' => 'Show help'                  },
   ); 
   
 # handle command line options
 GetOptions( $option{'entity'}   {'string'} => $option{'entity'}   {'ref'},
-            $option{'channels'} {'string'} => $option{'channels'} {'ref'},            
+#            $option{'channels'} {'string'} => $option{'channels'} {'ref'},            
             $option{'help'}     {'string'} => $option{'help'}     {'ref'},    
           ) or die;
 

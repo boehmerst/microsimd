@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package crossbar_pkg is
+  -- TODO: use VHDL-2008 package to customize width
   constant xbar_addr_width_c : integer := 16;
   constant xbar_data_width_c : integer := 32;
 

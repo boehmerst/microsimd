@@ -41,6 +41,8 @@ constant dflt_hibi_dma_gif_req_c : hibi_dma_gif_req_t :=(
   rd    => '0'
 );
 
+type hibi_dma_gif_req_arr_t is array(natural range <>) of hibi_dma_gif_req_t;
+
 type hibi_dma_gif_rsp_t is record
   rdata : std_ulogic_vector(hibi_dma_data_width_c-1 downto 0);
   ack   : std_ulogic;
@@ -49,6 +51,8 @@ constant dflt_hibi_dma_gif_rsp_c : hibi_dma_gif_rsp_t :=(
   rdata => (others=>'0'),
   ack   => '0'
 );
+
+type hibi_dma_gif_rsp_arr_t is array(natural range <>) of hibi_dma_gif_rsp_t;
 
 end package hibi_dma_regif_types_pkg;
 

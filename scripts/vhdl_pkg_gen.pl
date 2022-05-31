@@ -98,12 +98,9 @@ foreach my $reg (@$desc)
   my $addr_offset_integer       = $$reg{offset};
 
   my $addr_offset_unsigned_name =  "addr_offset_" . $$reg{name} . "_unsigned_c";
-  #my $addr_offset_unsigned      = "x\"" . sprintf("%08x", $addr_offset_integer) . "\"";
-
   my $addr_offset_slv_name      =  "addr_offset_" . $$reg{name} . "_slv_c";
-  #my $addr_offset_slv           = "x\"" . sprintf("%08x", $addr_offset_integer) . "\"";
   
-  my $addr_offset_slv = sprintf("%0$addr_width" ."b", $addr_offset_integer);
+  my $addr_offset_slv           = sprintf("%0$addr_width" ."b", $addr_offset_integer);
 
   print $fh 
 "-------------------------------------------------------------------------------\n" .
@@ -209,7 +206,6 @@ foreach my $reg (@$desc)
         
         # TODO: check for exceeding the range
         my $nr_bits = $$fld{slc}[1] - $$fld{slc}[0] + 1;
-        #my $val     = unpack("b$nr_bits", sprintf("%08x",$$fld{rst}));
         my $val     = sprintf("%0$nr_bits" . "b", $$fld{rst});
         
         if($index == $nr_rw_slc)
@@ -360,8 +356,7 @@ foreach my $reg (@$desc)
       print $fh "  ro : $regname" . "_ro_t;\n";
     }
         
-    push(@logic2reg, ($$reg{name} . " : " . $regname . "_logic2reg_t;\n"));
-    
+    push(@logic2reg, ($$reg{name} . " : " . $regname . "_logic2reg_t;\n"));    
     print $fh "end record $regname" . "_logic2reg_t;\n\n";
   }
   
@@ -369,12 +364,12 @@ foreach my $reg (@$desc)
   ###########################################################################################################
   # debug print message
   ###########################################################################################################
-  print "found register \"$$reg{name}\" with addr offset 0x" . sprintf("%04x",$$reg{offset}) . "\n";
-  foreach my $fld (@{$$reg{fld}})
-  {
-    print " -> $$fld{name}, $$fld{desc}, Bit $$fld{slc}[0] to $$fld{slc}[0], $$fld{type}," .
-      "reset value 0x" . sprintf("%04x",$$fld{rst}) . "\n";
-  }
+  #print "found register \"$$reg{name}\" with addr offset 0x" . sprintf("%04x",$$reg{offset}) . "\n";
+  #foreach my $fld (@{$$reg{fld}})
+  #{
+  #  print " -> $$fld{name}, $$fld{desc}, Bit $$fld{slc}[0] to $$fld{slc}[0], $$fld{type}," .
+  #    "reset value 0x" . sprintf("%04x",$$fld{rst}) . "\n";
+  #}
 }
 
 ###########################################################################################################
@@ -386,7 +381,7 @@ print $fh
 "-- putting it all together\n" .
 "-------------------------------------------------------------------------------\n";
 
-if($#reg2logic > 0)
+if(scalar @reg2logic > 0)
 {
   print $fh "type $base" . "_reg2logic_t is record\n";
   foreach my $str (@reg2logic)
@@ -396,7 +391,7 @@ if($#reg2logic > 0)
   print $fh "end record $base" . "_reg2logic_t;\n\n";
 }
 
-if($#logic2reg > 0)
+if(scalar @logic2reg > 0)
 {
   print $fh "type $base" . "_logic2reg_t is record\n";
   foreach my $str (@logic2reg)

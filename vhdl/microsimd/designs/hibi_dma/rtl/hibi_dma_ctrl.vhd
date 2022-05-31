@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_dma_ctrl.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -28,7 +28,8 @@ use general.general_function_pkg.all;
 
 library microsimd;
 use microsimd.hibi_link_pkg.all;
-use microsimd.hibi_dma_regif_types_pkg.all;
+library work;
+use work.hibi_dma_regif_types_pkg.all;
 
 entity hibi_dma_ctrl is
   port (

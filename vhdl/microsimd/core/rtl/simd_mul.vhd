@@ -37,7 +37,6 @@ architecture rtl of simd_mul is
   type reg_t is record
     state     : state_t;
     ready     : std_ulogic;
-    calc      : std_ulogic;
     count     : count_t;
     mul_start : std_ulogic;
     data      : vec_data_t;
@@ -48,7 +47,6 @@ architecture rtl of simd_mul is
   constant dflt_reg_c : reg_t :=(
     state     => idle,
     ready     => '1',
-    calc      => '0',
     count     => dflt_count_c,
     mul_start => '0',
     data      => dflt_vec_data_c,

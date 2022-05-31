@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_mem_core.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -28,7 +28,8 @@ use general.general_function_pkg.all;
 
 library microsimd;
 use microsimd.hibi_link_pkg.all;
-use microsimd.hibi_mem_pkg.all;
+library work;
+use work.hibi_mem_pkg.all;
 
 entity hibi_mem_core is
   generic (
@@ -318,30 +319,30 @@ begin
     ----------------------------------------------------------------------------
     case v.tx.state is
       when tx_idle         => if(unsigned(v_tx_arb_req) /= 0) then
-                                v.tx.state                  := describtor_switch;
+                                v.tx.state                     := describtor_switch;
                               end if;
 
-      when describtor_switch  => v.tx.describtor            := v.channels(tx_channel).describtor;
+      when describtor_switch  => v.tx.describtor               := v.channels(tx_channel).describtor;
 
-                              v.tx.describtor.burst_count   := to_unsigned(max_burst_length_c, v.tx.describtor.burst_count'length);
+                              v.tx.describtor.burst_count      := to_unsigned(max_burst_length_c, v.tx.describtor.burst_count'length);
                               if(v.tx.describtor.pull_count < max_burst_length_c) then
-                                v.tx.describtor.burst_count := v.tx.describtor.pull_count(v.tx.describtor.burst_count'range);
+                                v.tx.describtor.burst_count    := v.tx.describtor.pull_count(v.tx.describtor.burst_count'range);
                               end if;
 
-                              v.tx.state                    := pull_mem;
-                              v.tx.describtor.mem_req.en    := '1';
-                              v.tx.lock_mem                 := '1';
+                              v.tx.state                       := pull_mem;
+                              v.tx.describtor.mem_req.en       := '1';
+                              v.tx.lock_mem                    := '1';
 
                               if(mem_wait_i = '1' or r.rx.lock_mem = '1') then
-                                v.tx.state                  := wait_pull_mem;
-                                v.tx.describtor.mem_req.en  := '0';
-                                v.tx.lock_mem               := '0';
+                                v.tx.state                     := wait_pull_mem;
+                                v.tx.describtor.mem_req.en     := '0';
+                                v.tx.lock_mem                  := '0';
                               end if;
 
       when wait_pull_mem   => if(mem_wait_i = '0' and r.rx.lock_mem = '0') then
-                                v.tx.state                  := pull_mem;
-                                v.tx.describtor.mem_req.en  := '1';
-                                v.tx.lock_mem               := '1';
+                                v.tx.state                     := pull_mem;
+                                v.tx.describtor.mem_req.en     := '1';
+                                v.tx.lock_mem                  := '1';
                               end if;
 
       when pull_mem        => if(mem_wait_i = '0') then
@@ -455,56 +456,56 @@ begin
                                 end if;
                               else
                                 if(v.rx.describtor.burst_count = 0) then
-                                  v.rx.state                     := push_mem;
-                                  v.rx.hibi_rxreq                := dflt_agent_rxreq_c;
-                                  v.rx.describtor.mem_req.en     := '1';
-                                  v.rx.lock_mem                  := '1';
+                                  v.rx.state                        := push_mem;
+                                  v.rx.hibi_rxreq                   := dflt_agent_rxreq_c;
+                                  v.rx.describtor.mem_req.en        := '1';
+                                  v.rx.lock_mem                     := '1';
 
                                   if(mem_wait_i = '1' or v.tx.lock_mem = '1' or r.tx.lock_mem = '1') then
-                                    v.rx.state                   := wait_push_mem;
-                                    v.rx.describtor.mem_req.en   := '0';
-                                    v.rx.lock_mem                := '0';
+                                    v.rx.state                      := wait_push_mem;
+                                    v.rx.describtor.mem_req.en      := '0';
+                                    v.rx.lock_mem                   := '0';
                                   end if;
 
-                                  v.rx.describtor.buffer_index   := (others=>'0');
-                                  v.rx.describtor.burst_count    := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);
+                                  v.rx.describtor.buffer_index      := (others=>'0');
+                                  v.rx.describtor.burst_count       := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);
                                   if(v.rx.describtor.push_count < max_burst_length_c) then
-                                    v.rx.describtor.burst_count  := v.rx.describtor.push_count(v.rx.describtor.burst_count'range);
+                                    v.rx.describtor.burst_count     := v.rx.describtor.push_count(v.rx.describtor.burst_count'range);
                                   end if;
                                 end if;
                               end if;
 
       when wait_push_mem   => if(mem_wait_i = '0' and v.tx.lock_mem = '0' and r.tx.lock_mem = '0') then
-                                v.rx.state                       := push_mem;
-                                v.rx.describtor.mem_req.en       := '1';
-                                v.rx.lock_mem                    := '1';
+                                v.rx.state                          := push_mem;
+                                v.rx.describtor.mem_req.en          := '1';
+                                v.rx.lock_mem                       := '1';
                               end if;
 
       when push_mem        => if(mem_wait_i = '0') then
                                 if(cfg_i(rx_channel).const_addr = '0') then
-                                  v.rx.describtor.mem_req.addr   := r.rx.describtor.mem_req.addr + 4;
+                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 4;
                                 end if;
 
                                 if(v.rx.describtor.burst_count = 0) then
-                                  v.rx.state                     := pull_hibi;
-                                  v.rx.hibi_rxreq.re             := '1';
-                                  v.rx.describtor.mem_req.en     := '0';
-                                  v.rx.lock_mem                  := '0';
+                                  v.rx.state                        := pull_hibi;
+                                  v.rx.hibi_rxreq.re                := '1';
+                                  v.rx.describtor.mem_req.en        := '0';
+                                  v.rx.lock_mem                     := '0';
 
-                                  v.rx.describtor.buffer_index   := (others=>'0');
-                                  v.rx.describtor.burst_count    := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);
+                                  v.rx.describtor.buffer_index      := (others=>'0');
+                                  v.rx.describtor.burst_count       := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);
                                   if(v.rx.describtor.pull_count < max_burst_length_c) then
-                                    v.rx.describtor.burst_count  := v.rx.describtor.pull_count(v.rx.describtor.burst_count'range);
+                                    v.rx.describtor.burst_count     := v.rx.describtor.pull_count(v.rx.describtor.burst_count'range);
                                   end if;
 
                                   if(agent_rxrsp_i.empty = '1') then
-                                    v.rx.state                   := wait_pull_hibi;
-                                    v.rx.hibi_rxreq.re           := '0';
+                                    v.rx.state                      := wait_pull_hibi;
+                                    v.rx.hibi_rxreq.re              := '0';
                                   end if;
 
                                   if(v.rx.describtor.push_count = 0) then
-                                    v.rx.state                   := rx_idle;
-                                    v.rx.describtor.mem_req      := dflt_mem_req_c;
+                                    v.rx.state                      := rx_idle;
+                                    v.rx.describtor.mem_req         := dflt_mem_req_c;
 
                                     v.channels(rx_channel).status.busy := '0';
                                     v.channels(rx_channel).active      := '0';

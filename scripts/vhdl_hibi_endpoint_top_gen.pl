@@ -13,6 +13,7 @@ my $lib             = "work";
 my $channels        =  4;
 my $hostif;
 my $chaining;
+my $gpio;
 
 # command line options table
 my %option = 
@@ -20,7 +21,8 @@ my %option =
     'lib'              => { 'string' => 'lib|l=s',                'ref' => \$lib,             'help' => 'Specify library name'               },
     'channels'         => { 'string' => 'channels|ch=i',          'ref' => \$channels,        'help' => 'Specify number of channels'         },
     'hostif'           => { 'string' => 'hostif|hi',              'ref' => \$hostif,          'help' => 'DMA has external host interface'    },
-    'chaining'         => { 'string' => 'chaining|chn',           'ref' => \$chaining,        'help' => 'Support for chaining DMA transfers' },  
+    'chaining'         => { 'string' => 'chaining|chn',           'ref' => \$chaining,        'help' => 'Support for chaining DMA transfers' },
+    'gpio'             => { 'string' => 'gpio|g',                 'ref' => \$gpio,            'help' => 'Support for GPIO'                   },
     'help'             => { 'string' => 'help|?',                 'ref' => \&help,            'help' => 'Show help'                          },
   ); 
 
@@ -29,13 +31,13 @@ GetOptions( $option{'entity'}          {'string'} => $option{'entity'}          
             $option{'lib'}             {'string'} => $option{'lib'}             {'ref'},
             $option{'channels'}        {'string'} => $option{'channels'}        {'ref'},
             $option{'hostif'}          {'string'} => $option{'hostif'}          {'ref'},
-            $option{'chaining'}        {'string'} => $option{'chaining'}        {'ref'},        
+            $option{'chaining'}        {'string'} => $option{'chaining'}        {'ref'},
+	    $option{'gpio'}            {'string'} => $option{'gpio'}            {'ref'},	    
             $option{'help'}            {'string'} => $option{'help'}            {'ref'},    
           ) or die;
 
 # generate gif mux
 if(defined($hostif)) {
-
   my$file_name = $entity . "_gif_mux.vhd";
   my $fh = new FileHandle;
   open($fh, ">$file_name") or die "could not create $file_name\n";
@@ -206,7 +208,8 @@ print $fh
 "use ieee.numeric_std.all;\n" .
 "\n" .
 "library microsimd;\n" .
-"use microsimd.hibi_link_pkg.all;\n";
+"use microsimd.hibi_link_pkg.all;\n" .
+"\n";
 
 if(!($lib eq "microsimd")) {
   print $fh "library $lib;\n";
@@ -232,6 +235,13 @@ if(defined($hostif)) {
   print $fh
 "    ext_gif_req_i     : in  $entity" . "_gif_req_t;\n" .
 "    ext_gif_rsp_o     : out $entity" . "_gif_rsp_t;\n";
+}
+
+if(defined($gpio)) {
+  print $fh
+"    gpio_o            : out $entity" . "_HIBI_DMA_GPIO_reg2logic_t;\n" .
+"    gpio_i            : in  $entity" . "_HIBI_DMA_GPIO_logic2reg_t;\n" .
+"    gpio_dir_o        : out $entity" . "_HIBI_DMA_GPIO_DIR_reg2logic_t;\n";
 }
 
 print $fh
@@ -407,7 +417,7 @@ if(defined($hostif)) {
 "  -----------------------------------------------------------------------------\n" .
 "  -- gif mux interface\n" .
 "  -----------------------------------------------------------------------------\n" .
-"  muxi0: entity $lib" . "." . "hibi_dma_gif_mux\n" .
+"  muxi0: entity $lib" . "." . "$entity" . "_gif_mux\n" .
 "    port map (\n" .
 "      clk_i         => clk_i,\n" .
 "      reset_n_i     => reset_n_i,\n" .
@@ -445,6 +455,15 @@ for(my $i = 0; $i < $channels; $i++) {
   print $fh "  dma_cfg($i).cmd                     <= regifi0_reg2logic.HIBI_DMA_CFG$i.rw.hibi_cmd;\n\n";  
 }
 
+
+if(defined($gpio)) {
+  print $fh
+"  gpio_o                  <= regifi0_reg2logic.HIBI_DMA_GPIO;\n" .
+"  gpio_dir_o              <= regifi0_reg2logic.HIBI_DMA_GPIO_DIR;\n" .
+"  logic2reg.HIBI_DMA_GPIO <= gpio_i;\n\n";
+}
+
+
 print $fh
 "  ------------------------------------------------------------------------------\n" .
 "  -- dma enable and init logic\n" .
@@ -464,6 +483,168 @@ print $fh
 "\n";
 
 close($fh);
+
+
+
+
+
+
+if(defined($hostif)) {
+
+
+  my $file_name = $entity . "_gif_mux.vhd";
+  my $fh = new FileHandle;
+  open($fh, ">$file_name") or die "could not create $file_name\n";
+
+
+  print $fh
+    "-------------------------------------------------------------------------------\n" .
+    "-- Title      : $entity" . "_gif_mux\n" .
+    "-- Project    :\n" .
+    "-------------------------------------------------------------------------------\n" .
+    "-- File       : $file_name\n" .
+    "-- Author     : $user\n" .
+    "-- Company    : private\n" .
+    "-- Created    : \n" .
+    "-- Last update: \n" .
+    "-- Platform   : \n" .
+    "-- Standard   : VHDL'93\n" .
+    "-------------------------------------------------------------------------------\n" .
+    "-- Description: automated generated do not edit manually\n" .
+    "-------------------------------------------------------------------------------\n" .
+    "-- Copyright (c) 2013 Stephan Böhmer\n" .
+    "-------------------------------------------------------------------------------\n" .
+    "-- Revisions  :\n" .
+    "-- Date        Version  Author  Description\n" .
+    "--             1.0      SBo     Created\n" .
+   "-------------------------------------------------------------------------------\n\n";
+
+  print $fh
+    "library ieee;\n" .
+    "use ieee.std_logic_1164.all;\n" .
+    "use ieee.numeric_std.all;\n\n" .
+
+    "library $lib;\n" .
+    "use $lib." . "$entity" . "_regif_types_pkg.all;\n\n";
+
+  print $fh
+    "entity " . "$entity" . "_gif_mux is\n" .
+    "  port (\n" .
+    "    clk_i         : in  std_ulogic;\n" .
+    "    reset_n_i     : in  std_ulogic;\n" .
+    "    en_i          : in  std_ulogic;\n" .
+    "    init_i        : in  std_ulogic;\n" .
+    "    m0_gif_req_i  : in  " . "$entity" . "_gif_req_t;\n" .
+    "    m0_gif_rsp_o  : out " . "$entity" . "_gif_rsp_t;\n" .
+    "    m1_gif_req_i  : in  " . "$entity" . "_gif_req_t;\n" .
+    "    m1_gif_rsp_o  : out " . "$entity" . "_gif_rsp_t;\n" .
+    "    mux_gif_req_o : out " . "$entity" . "_gif_req_t;\n" .
+    "    mux_gif_rsp_i : in  " . "$entity" . "_gif_rsp_t\n" .
+    "  );\n" .
+    "end entity " . "$entity" . "_gif_mux;\n\n";
+
+  print $fh
+    "architecture rtl of " . "$entity" . "_gif_mux is\n" .
+    "\n" .
+    "  type reg_t is record\n" .
+    "    state   : std_ulogic;\n" .
+    "    mux_sel : std_ulogic;\n" .
+    "    m1_req  : " . "$entity" . "_gif_req_t;\n" .
+    "  end record reg_t;\n" .
+    "  constant dflt_reg_c : reg_t :=(\n" .
+    "    state   => '0',\n" .
+    "    mux_sel => '0',\n" .
+    "    m1_req  => dflt_" . "$entity" . "_gif_req_c\n" .
+    "  );\n" .
+    "\n" .
+    "  signal r, rin : reg_t;\n" .
+    "\n" .
+    "begin\n";
+
+  print $fh  
+    "  ------------------------------------------------------------------------------\n" .
+    "  -- comb0\n" .
+    "  ------------------------------------------------------------------------------\n" .
+    "  comb0: process(r, m0_gif_req_i, m1_gif_req_i) is\n" .
+    "    variable v         : reg_t;\n" .
+    "    variable m0_req_en : std_ulogic;\n" .
+    "    variable m1_req_en : std_ulogic;\n" .
+    "  begin\n" .
+    "    v := r;\n" .
+    "\n" .
+    "    m0_req_en := m0_gif_req_i.rd or m0_gif_req_i.wr;\n" .
+    "    m1_req_en := m1_gif_req_i.rd or m1_gif_req_i.wr;\n" .
+    "\n" .
+    "    -- NOTE: conditionally register m1 request, we do not reset the register\n" .
+    "    --       because the output mux defaults to m0\n" .
+    "    if m1_req_en = '1' then\n" .
+    "      v.m1_req := m1_gif_req_i;\n" .
+    "    end if;\n" .
+    "\n" .
+    "    ----------------------------------------------------------------------------\n" .
+    "    -- this is a simplified mux that strictely assumes the slave to respond\n" .
+    "    -- in the following clock cycle\n" .
+    "    -- master zero is served first in case of competing requests\n" .
+    "    -- master one request gets registered \n" .
+    "    ----------------------------------------------------------------------------\n" .
+    "    case v.state is\n" .
+    "      when '0'    => v.mux_sel   := '0';\n" .
+    "                     v.state     := '0';\n" .
+    "\n" .
+    "                     if(m0_req_en = '0' and m1_req_en = '1') then\n" .
+    "                       v.mux_sel := '1';\n" .
+    "                     end if;\n" .
+    "\n" .
+    "                     if(m0_req_en = '1' and m1_req_en = '1') then\n" .
+    "                       v.state   := '1';\n" .
+    "                     end if;\n" .
+    "\n" .
+    "      when '1'    => v.mux_sel   := '1';\n" .
+    "                     v.state     := '0';\n" .
+    "\n" .
+    "      when others => null;\n" .
+    "    end case;\n" .
+    "\n" .
+    "    rin <= v;\n".
+    "  end process comb0;\n" .
+    "\n" .
+    "  mux_gif_req_o      <= m0_gif_req_i when rin.mux_sel = '0' else rin.m1_req;\n" .
+    "\n" .
+    "  m0_gif_rsp_o.rdata <= mux_gif_rsp_i.rdata;\n" .
+    "  m1_gif_rsp_o.rdata <= mux_gif_rsp_i.rdata;\n" .
+    "\n" .
+    "  m0_gif_rsp_o.ack   <= mux_gif_rsp_i.ack when r.mux_sel = '0' else '0';\n" .
+    "  m1_gif_rsp_o.ack   <= mux_gif_rsp_i.ack when r.mux_sel = '1' else '0';\n" .
+    "\n";
+
+  print $fh 
+    "  ------------------------------------------------------------------------------\n" .
+    "  -- sync0\n" .
+    "  ------------------------------------------------------------------------------\n" .
+    "  sync0: process(reset_n_i, clk_i) is\n" .
+    "  begin\n" .
+    "    if(reset_n_i = '0') then\n" .
+    "      r <= dflt_reg_c;\n" .
+    "    elsif(rising_edge(clk_i)) then\n" .
+    "      if(en_i = '1') then\n" .
+    "        if(init_i = '1') then\n" . 
+    "          r <= dflt_reg_c;\n" .
+    "        else\n" .
+    "          r <= rin;\n" .
+    "        end if;\n" .
+    "      end if;\n" .
+    "    end if;\n" .
+    "  end process sync0;\n" .
+    "\n" .
+    "end architecture rtl;\n";
+
+
+
+  close $fh
+}
+
+
+
 
 # help
 sub help

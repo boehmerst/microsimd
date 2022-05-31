@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_mem_pkg.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -26,7 +26,7 @@ use ieee.numeric_std.all;
 package hibi_mem_pkg is
 
   constant hibi_mem_hibi_addr_width_c : natural := 16;
-  constant hibi_mem_mem_addr_width_c  : natural := 18;
+  constant hibi_mem_mem_addr_width_c  : natural := 10;
   constant hibi_mem_mem_data_width_c  : natural := 32;
   constant hibi_mem_count_width_c     : natural := 10;
   constant hibi_mem_channels_c        : natural := 4;

@@ -32,7 +32,7 @@ architecture rtl of fsl_per is
 
 begin
   ------------------------------------------------------------------------------
-  -- hibi dma register file
+  -- fsl_per register file
   ------------------------------------------------------------------------------
   regifi0: entity work.fsl_per_regfile
     port map (

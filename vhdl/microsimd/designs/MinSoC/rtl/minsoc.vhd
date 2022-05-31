@@ -85,16 +85,16 @@ begin
 
     memi0 : entity work.sram_4en
       generic map (
-        width_g => CFG_DMEM_WIDTH,
-        size_g  => ram_size_c-2
+        data_width_g => CFG_DMEM_WIDTH,
+        addr_width_g => ram_size_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => mem_en,
-        adr_i => xbari0_slv_req(xbar_slv_t'pos(rom)).addr(ram_size_c-1 downto 2),
-        dat_i => xbari0_slv_req(xbar_slv_t'pos(rom)).wdata,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => mem_en,
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(rom)).addr(ram_size_c-1 downto 2),
+        dat_i  => xbari0_slv_req(xbar_slv_t'pos(rom)).wdata,
+        dat_o  => mem_dat
       );
     
      xbar_slv_rsp(xbar_slv_t'pos(rom)).rdata <= mem_dat;
@@ -113,16 +113,16 @@ begin
 
     memi0 : entity work.sram_4en
       generic map (
-        width_g => CFG_DMEM_WIDTH,
-        size_g  => ram_size_c-2
+        data_width_g => CFG_DMEM_WIDTH,
+        addr_width_g => ram_size_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => mem_en,
-        adr_i => xbari0_slv_req(xbar_slv_t'pos(ram)).addr(ram_size_c-1 downto 2),
-        dat_i => xbari0_slv_req(xbar_slv_t'pos(ram)).wdata,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => mem_en,
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(ram)).addr(ram_size_c-1 downto 2),
+        dat_i  => xbari0_slv_req(xbar_slv_t'pos(ram)).wdata,
+        dat_o  => mem_dat
       );
     
      xbar_slv_rsp(xbar_slv_t'pos(ram)).rdata <= mem_dat;

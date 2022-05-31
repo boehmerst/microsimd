@@ -130,19 +130,17 @@ print $fh
 "    clk_i       : in  std_ulogic;\n" .
 "    $reset_name   : in  std_ulogic;\n" .
 "    gif_req_i   : in  $base" . "_gif_req_t;\n" .
-"    gif_rsp_o   : out $base" . "_gif_rsp_t;\n";
+"    gif_rsp_o   : out $base" . "_gif_rsp_t";
 
 if($need_logic2reg == 1)
 {
+  print $fh ";\n";
   print $fh "    logic2reg_i : in  $base" . "_logic2reg_t";
-  if($need_reg2logic == 1)
-  {
-    print $fh ";\n";
-  }
 }
 
 if($need_reg2logic == 1)
 {
+  print $fh ";\n";
   print $fh "    reg2logic_o : out $base" . "_reg2logic_t\n"; 
 }
 

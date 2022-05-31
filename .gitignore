@@ -1,6 +1,7 @@
 .microsimd.sh
 ghdl.ini
 *.mk
+*.swp
 build
 makefile
 archiv

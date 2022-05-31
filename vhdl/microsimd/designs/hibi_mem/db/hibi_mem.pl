@@ -3,7 +3,7 @@
 #-- Project    :
 #-------------------------------------------------------------------------------
 #-- File       : hibi_mem.pl
-#-- Author     : boehmers
+#-- Author     : deboehse
 #-- Company    : private
 #-- Created    : 
 #-- Last update: 
@@ -57,7 +57,7 @@ my $ref_trig = {
 };
 
 my $ref_cfg0 = {
-  offset => 0x04,
+  offset => 0x03,
   name   => 'HIBI_DMA_CFG0',
   desc   => 'configuration register',
   fld    => [
@@ -69,16 +69,16 @@ my $ref_cfg0 = {
 };
 
 my $ref_dma_addr0 = {
-  offset => 0x05,
+  offset => 0x04,
   name   => 'HIBI_DMA_MEM_ADDR0',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 17],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 9],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 
 my $ref_hibi_addr0 = {
-  offset => 0x06,
+  offset => 0x05,
   name   => 'HIBI_DMA_HIBI_ADDR0',
   desc   => 'hibi address',
   fld    => [
@@ -87,7 +87,7 @@ my $ref_hibi_addr0 = {
 };
 
 my $ref_trig_mask0 = {
-  offset => 0x07,
+  offset => 0x06,
   name   => 'HIBI_DMA_TRIGGER_MASK0',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -96,7 +96,7 @@ my $ref_trig_mask0 = {
 };
 
 my $ref_cfg1 = {
-  offset => 0x08,
+  offset => 0x07,
   name   => 'HIBI_DMA_CFG1',
   desc   => 'configuration register',
   fld    => [
@@ -108,16 +108,16 @@ my $ref_cfg1 = {
 };
 
 my $ref_dma_addr1 = {
-  offset => 0x09,
+  offset => 0x08,
   name   => 'HIBI_DMA_MEM_ADDR1',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 17],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 9],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 
 my $ref_hibi_addr1 = {
-  offset => 0x0a,
+  offset => 0x09,
   name   => 'HIBI_DMA_HIBI_ADDR1',
   desc   => 'hibi address',
   fld    => [
@@ -126,7 +126,7 @@ my $ref_hibi_addr1 = {
 };
 
 my $ref_trig_mask1 = {
-  offset => 0x0b,
+  offset => 0x0a,
   name   => 'HIBI_DMA_TRIGGER_MASK1',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -135,7 +135,7 @@ my $ref_trig_mask1 = {
 };
 
 my $ref_cfg2 = {
-  offset => 0x0c,
+  offset => 0x0b,
   name   => 'HIBI_DMA_CFG2',
   desc   => 'configuration register',
   fld    => [
@@ -147,16 +147,16 @@ my $ref_cfg2 = {
 };
 
 my $ref_dma_addr2 = {
-  offset => 0x0d,
+  offset => 0x0c,
   name   => 'HIBI_DMA_MEM_ADDR2',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 17],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 9],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 
 my $ref_hibi_addr2 = {
-  offset => 0x0e,
+  offset => 0x0d,
   name   => 'HIBI_DMA_HIBI_ADDR2',
   desc   => 'hibi address',
   fld    => [
@@ -165,7 +165,7 @@ my $ref_hibi_addr2 = {
 };
 
 my $ref_trig_mask2 = {
-  offset => 0x0f,
+  offset => 0x0e,
   name   => 'HIBI_DMA_TRIGGER_MASK2',
   desc   => 'trigger mask for DMA chaining',
   fld    => [
@@ -174,7 +174,7 @@ my $ref_trig_mask2 = {
 };
 
 my $ref_cfg3 = {
-  offset => 0x10,
+  offset => 0x0f,
   name   => 'HIBI_DMA_CFG3',
   desc   => 'configuration register',
   fld    => [
@@ -186,16 +186,16 @@ my $ref_cfg3 = {
 };
 
 my $ref_dma_addr3 = {
-  offset => 0x11,
+  offset => 0x10,
   name   => 'HIBI_DMA_MEM_ADDR3',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 17],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 9],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 
 my $ref_hibi_addr3 = {
-  offset => 0x12,
+  offset => 0x11,
   name   => 'HIBI_DMA_HIBI_ADDR3',
   desc   => 'hibi address',
   fld    => [
@@ -204,7 +204,7 @@ my $ref_hibi_addr3 = {
 };
 
 my $ref_trig_mask3 = {
-  offset => 0x13,
+  offset => 0x12,
   name   => 'HIBI_DMA_TRIGGER_MASK3',
   desc   => 'trigger mask for DMA chaining',
   fld    => [

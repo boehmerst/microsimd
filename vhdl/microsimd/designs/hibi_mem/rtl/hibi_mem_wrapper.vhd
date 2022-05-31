@@ -70,16 +70,16 @@ begin
 
     memi0 : entity microsimd.sram_4en
       generic map (
-        width_g => hibi_mem_mem_data_width_c,
-        size_g  => hibi_mem_mem_addr_width_c-2
+        data_width_g => hibi_mem_mem_data_width_c,
+        addr_width_g => hibi_mem_mem_addr_width_c-2
       )
       port map (
-        clk_i => clk_i,
-        wre_i => mem_we,
-        ena_i => memi0_mem_req.ena,
-        adr_i => memi0_mem_req.adr(hibi_mem_mem_addr_width_c-1 downto 2),
-        dat_i => memi0_mem_req.dat,
-        dat_o => mem_dat
+        clk_i  => clk_i,
+        wre_i  => mem_we,
+        ena_i  => memi0_mem_req.ena,
+        addr_i => memi0_mem_req.adr(hibi_mem_mem_addr_width_c-1 downto 2),
+        dat_i  => memi0_mem_req.dat,
+        dat_o  => mem_dat
       );
        
      mem_rsp.dat <= mem_dat;

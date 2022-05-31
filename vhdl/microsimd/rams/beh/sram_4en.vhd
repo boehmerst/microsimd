@@ -18,6 +18,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+--library std;
+use std.textio.all;
+
 -- pragma translate_off
 library work;
 use work.func_pkg.notx;
@@ -25,16 +28,17 @@ use work.func_pkg.notx;
 
 entity sram_4en is 
   generic (
-    width_g : positive := 32;
-    size_g  : positive := 16
+    file_name_g  : string   := "none"; 
+    data_width_g : positive := 32;
+    addr_width_g : positive := 16
   );
   port (
-    clk_i : in  std_ulogic;
-    wre_i : in  std_ulogic_vector(width_g/8-1 downto 0);     
-    ena_i : in  std_ulogic;
-    adr_i : in  std_ulogic_vector(size_g-1 downto 0);
-    dat_i : in  std_ulogic_vector(width_g-1 downto 0);
-    dat_o : out std_ulogic_vector(width_g-1 downto 0)
+    clk_i  : in  std_ulogic;
+    wre_i  : in  std_ulogic_vector(data_width_g/8-1 downto 0);   
+    ena_i  : in  std_ulogic;
+    addr_i : in  std_ulogic_vector(addr_width_g-1 downto 0);
+    dat_i  : in  std_ulogic_vector(data_width_g-1 downto 0);
+    dat_o  : out std_ulogic_vector(data_width_g-1 downto 0)
   );
 end sram_4en;
 
@@ -42,24 +46,64 @@ end sram_4en;
 -- supported by many devices (although it comes straight from the library. Many devices give
 -- cryptic synthesization errors on this implementation, so it is not the default.
 architecture beh of sram_4en is
+  constant entries : integer := (2**addr_width_g);
 
-  type ram_t is array(2**size_g-1 downto 0) of std_ulogic_vector(width_g-1 downto 0);
-  type sel_t is array(width_g/8-1 downto 0) of std_ulogic_vector(7 downto 0);
+  type ram_t is array(entries-1 downto 0) of std_ulogic_vector(data_width_g-1 downto 0);
+  type sel_t is array(data_width_g/8-1 downto 0) of std_ulogic_vector(7 downto 0);
 
-  signal ram : ram_t;
+  shared variable ram : ram_t := (others => (others => '0'));
   signal di  : sel_t;
+
+  -------------------------------------------------------------------------------
+  -- mem_init
+  -------------------------------------------------------------------------------
+  procedure mem_init(variable RAM : inout ram_t) is
+    file     readfile       : text open read_mode is file_name_g;
+    variable vecline        : line;
+
+    variable add_ulv        : std_ulogic_vector(addr_width_g-1 downto 0);
+    variable var_ulv        : std_ulogic_vector(data_width_g-1 downto 0);
+
+    variable add_int        : natural   := 0;
+    variable addr_indicator : character := ' ';
+  begin
+    readline(readfile, vecline);
+
+    read(vecline, addr_indicator);
+    assert addr_indicator = '@' report "Incorrect address indicator: expecting @address" severity failure;
+
+    hread(vecline, add_ulv);
+    add_int := to_integer(unsigned(add_ulv));
+        	      
+    while not endfile(readfile) loop
+      ----------------------------------------------------------------------
+      -- read data
+      -----------------------------------------------------------------------
+      readline(readfile, vecline);
+      hread(vecline, var_ulv);
+
+      if(add_int > entries-1) then
+        assert false report "Address out of range while filling memory" severity failure;
+      else
+        ram(add_int) := var_ulv;
+        add_int      := add_int + 1;
+      end if;
+    end loop;
+    assert false report "Memory filling successfull" severity note;
+  end procedure mem_init;
+
   
 begin
-  process(wre_i, dat_i, adr_i)
+  process(wre_i, dat_i, addr_i)
   begin
-    for i in 0 to width_g/8 - 1 loop
+    for i in 0 to data_width_g/8 - 1 loop
       if wre_i(i) = '1' then
         di(i) <= dat_i((i+1)*8 - 1 downto i*8);
       else
 -- pragma translate_off      
-        if(notx(adr_i)) then
+        if(notx(addr_i)) then
 -- pragma translate_on        
-          di(i) <= ram(to_integer(unsigned(adr_i)))((i+1)*8-1 downto i*8);
+          di(i) <= ram(to_integer(unsigned(addr_i)))((i+1)*8-1 downto i*8);
 -- pragma translate_off          
         else
           di(i) <= (others=>'X'); -- let undefined state propagate without complaning about
@@ -69,14 +113,22 @@ begin
     end loop;
   end process;
 
-  process(clk_i)
+  mem: process(clk_i)
+    --variable ram          : ram_t;
+    variable readcontents : boolean := true;
   begin
+
+    if(readcontents = true and file_name_g /= "none") then
+      mem_init(ram);
+      readcontents := false;
+    end if;
+	  
     if rising_edge(clk_i) then
       if ena_i = '1' then
-        ram(to_integer(unsigned(adr_i))) <= di(3) & di(2) & di(1) & di(0);
-        dat_o <= di(3) & di(2) & di(1) & di(0);
+        ram(to_integer(unsigned(addr_i))) := di(3) & di(2) & di(1) & di(0);
+        dat_o                             <= di(3) & di(2) & di(1) & di(0);
       end if;
     end if;
-  end process;
-end beh;
+  end process mem;
+end architecture beh;
 

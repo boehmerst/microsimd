@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_mem.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -25,9 +25,11 @@ use ieee.numeric_std.all;
 
 library microsimd;
 use microsimd.hibi_link_pkg.all;
-use microsimd.hibi_mem_pkg.all;
-use microsimd.hibi_mem_regif_types_pkg.all;
-use microsimd.hibi_mem_regfile_pkg.all;
+
+library work;
+use work.hibi_mem_pkg.all;
+use work.hibi_mem_regif_types_pkg.all;
+use work.hibi_mem_regfile_pkg.all;
 
 entity hibi_mem is
   generic (
@@ -80,7 +82,7 @@ begin
   ------------------------------------------------------------------------------
   -- hibi dma register file
   ------------------------------------------------------------------------------
-  regifi0: entity microsimd.hibi_mem_regfile
+  regifi0: entity work.hibi_mem_regfile
     port map (
       clk_i       => clk_i,
       reset_n_i   => reset_n_i,
@@ -135,7 +137,7 @@ begin
   ------------------------------------------------------------------------------
   status_o <= dmai0_status;
 
-  dmai0: entity microsimd.hibi_mem_core
+  dmai0: entity work.hibi_mem_core
     generic map (
       log2_burst_length_g => log2_burst_length_g
     )
@@ -159,7 +161,7 @@ begin
   ----------------------------------------------------------------------------
   -- hibi_mem_ctrl
   ----------------------------------------------------------------------------
-  ctrli0: entity microsimd.hibi_mem_ctrl
+  ctrli0: entity work.hibi_mem_ctrl
     port map (
       clk_i              => clk_i,
       reset_n_i          => reset_n_i,

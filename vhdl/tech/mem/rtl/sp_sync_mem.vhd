@@ -7,6 +7,7 @@ use tech.tech_constants_pkg.all;
 
 entity sp_sync_mem is
   generic (
+    file_name_g  : string := "none";
     addr_width_g : integer;
     data_width_g : integer
   );
@@ -35,16 +36,17 @@ assert( target_tech_c = tech_behave_c or
 behave: if target_tech_c = tech_behave_c generate
   memi0: entity tech.sp_sync_mem_beh
     generic map (
+      file_name_g  => file_name_g,
       addr_width_g => addr_width_g,
       data_width_g => data_width_g
     )
     port map (
-      clk  => clk_i,
-      we   => we_i,
-      en   => en_i,
-      addr => addr_i,
-      di   => di_i,
-      do   => do_o
+      clk_i  => clk_i,
+      we_i   => we_i,
+      en_i   => en_i,
+      addr_i => addr_i,
+      di_i   => di_i,
+      do_o   => do_o
     );
 end generate behave;
 
@@ -58,12 +60,12 @@ xilinx: if target_tech_c = tech_xilinx_c generate
       data_width_g => data_width_g
     )
     port map (
-      clk  => clk_i,
-      we   => we_i,
-      en   => en_i,
-      addr => addr_i,
-      di   => di_i,
-      do   => do_o
+      clk_i  => clk_i,
+      we_i   => we_i,
+      en_i   => en_i,
+      addr_i => addr_i,
+      di_i   => di_i,
+      do_o   => do_o
     );
 end generate xilinx;
 

@@ -5,7 +5,6 @@ use ieee.numeric_std.all;
 library work;
 use work.config_pkg.all;
 use work.func_pkg.all;
-use work.func_pkg.all;
 
 package vec_data_pkg is
 

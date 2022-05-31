@@ -124,14 +124,14 @@ print $fh
 "    en          => '0'\n" .
 "  );\n".
 "\n" .
-"  type channel_context_t is record\n" .
+"  type channel_describtor_t is record\n" .
 "    pull_count      : unsigned($entity" . "_count_width_c-1 downto 0);\n" .
 "    push_count      : unsigned($entity" . "_count_width_c-1 downto 0);\n" .
 "    burst_count     : unsigned(log2_burst_length_g downto 0);\n" .
 "    buffer_index    : unsigned(log2_burst_length_g-1 downto 0);\n" .
 "    mem_req         : mem_req_t;\n" .
-"  end record channel_context_t;\n" .
-"  constant dflt_channel_context_c : channel_context_t :=(\n" .
+"  end record channel_describtor_t;\n" .
+"  constant dflt_channel_describtor_c : channel_describtor_t :=(\n" .
 "    pull_count      => (others=>'0'),\n" .
 "    push_count      => (others=>'0'),\n" .
 "    burst_count     => (others=>'0'),\n" .
@@ -141,13 +141,13 @@ print $fh
 "\n" .
 "  type channel_t is record\n" .
 "    data_buffer     : buffer_t;\n" .
-"    context         : channel_context_t;\n" .
+"    describtor      : channel_describtor_t;\n" .
 "    active          : std_ulogic;\n" .
 "    status          : $entity" . "_status_t;\n" .
 "  end record channel_t;\n" .
 "  constant dflt_channel_c : channel_t :=(\n" .
 "    data_buffer     => (others=>(others=>'0')),\n" .
-"    context         => dflt_channel_context_c,\n" .
+"    describtor      => dflt_channel_describtor_c,\n" .
 "    active          => '0',\n" .
 "    status          => dflt_$entity" . "_status_c\n" .
 "  );\n" .
@@ -155,19 +155,19 @@ print $fh
 "  type channel_arr_t is array(natural range 0 to $entity" . "_channels_c-1) of channel_t;\n" .
 "  constant dflt_channel_arr_c : channel_arr_t := (others=>dflt_channel_c);\n" .
 "\n" .  
-"  type tx_state_t is (tx_idle, context_switch, wait_pull_mem, pull_mem, last_pull_mem, wait_push_hibi, push_hibi);\n" .
+"  type tx_state_t is (tx_idle, describtor_switch, wait_pull_mem, pull_mem, last_pull_mem, wait_push_hibi, push_hibi);\n" .
 "  type rx_state_t is (rx_idle, wait_pull_hibi, pull_hibi, wait_push_mem, push_mem, last_push_mem, rx_error);\n" .
 "\n" .
 "  type rx_t is record\n" .
 "    state        : rx_state_t;\n" .
-"    context      : channel_context_t;\n" .   
+"    describtor   : channel_describtor_t;\n" .   
 "    hibi_rxreq   : agent_rxreq_t;\n" .
 "    curr_channel : std_ulogic_vector(log2ceil($entity" . "_channels_c)-1 downto 0);\n" .
 "    lock_mem     : std_ulogic;\n" .
 "  end record rx_t;\n" .
 "  constant dflt_rx_c : rx_t :=(\n" .
 "    state        => rx_idle,\n" .
-"    context      => dflt_channel_context_c,\n" .
+"    describtor   => dflt_channel_describtor_c,\n" .
 "    hibi_rxreq   => dflt_agent_rxreq_c,\n" .
 "    curr_channel => (others=>'0'),\n" .
 "    lock_mem     => '0'\n" .
@@ -175,14 +175,14 @@ print $fh
 "\n" .  
 "  type tx_t is record\n" .
 "    state      : tx_state_t;\n" .
-"    context    : channel_context_t;\n" .
+"    describtor : channel_describtor_t;\n" .
 "    hibi_txreq : agent_txreq_t;\n" .
 "    lock_mem   : std_ulogic;\n" .
 "    mem_ack    : std_ulogic;\n" .
 "  end record tx_t;\n" .
 "  constant dflt_tx_c : tx_t :=(\n" .
 "    state      => tx_idle,\n" .
-"    context    => dflt_channel_context_c,\n" .
+"    describtor => dflt_channel_describtor_c,\n" .
 "    hibi_txreq => dflt_agent_txreq_c,\n" .
 "    lock_mem   => '0',\n" .
 "    mem_ack    => '0'\n" .
@@ -208,7 +208,7 @@ print $fh
 "    variable active : std_ulogic_vector($entity" . "_channels_c-1 downto 0);\n" .
 "  begin\n" .
 "    act: for i in 0 to $entity" . "_channels_c-1 loop\n" .
-"      active(i) := ch(i).active and not ch(i).context.mem_req.we;\n" .
+"      active(i) := ch(i).active and not ch(i).describtor.mem_req.we;\n" .
 "    end loop act;\n" .
 "    return active;\n" .
 "  end function get_tx_channels;\n" .
@@ -220,7 +220,7 @@ print $fh
 "    variable active : std_ulogic_vector($entity" . "_channels_c-1 downto 0);\n" .
 "  begin\n" .
 "    act: for i in 0 to $entity" . "_channels_c-1 loop\n" .
-"      active(i) := ch(i).active and ch(i).context.mem_req.we;\n" .
+"      active(i) := ch(i).active and ch(i).describtor.mem_req.we;\n" .
 "    end loop act;\n" .
 "    return active;\n" .
 "  end function get_rx_channels;\n" .
@@ -303,13 +303,13 @@ print $fh
 "    -- write to internal data buffer MEM --> BUF (tx channel)\n" .
 "    ----------------------------------------------------------------------------\n" .
 "    if(mem_wait_i = '0') then\n" .
-"      v.tx.mem_ack                := r.tx.context.mem_req.en;\n" .
+"      v.tx.mem_ack                   := r.tx.describtor.mem_req.en;\n" .
 "      if(r.tx.mem_ack = '1') then\n" .
-"        v.channels(tx_channel).data_buffer(to_integer(r.tx.context.buffer_index))\n" .
-"                                                      := mem_rsp_i.dat;\n" .
-"        v.tx.context.buffer_index := r.tx.context.buffer_index + 1;\n" .
-"        v.tx.context.pull_count   := r.tx.context.pull_count - 1;\n" .
-"        v.tx.context.burst_count  := r.tx.context.burst_count - 1;\n" .
+"        v.channels(tx_channel).data_buffer(to_integer(r.tx.describtor.buffer_index))\n" .
+"                                     := mem_rsp_i.dat;\n" .
+"        v.tx.describtor.buffer_index := r.tx.describtor.buffer_index + 1;\n" .
+"        v.tx.describtor.pull_count   := r.tx.describtor.pull_count - 1;\n" .
+"        v.tx.describtor.burst_count  := r.tx.describtor.burst_count - 1;\n" .
 "      end if;\n" .
 "    end if;\n" .
 "\n" .
@@ -317,30 +317,30 @@ print $fh
 "    -- write to internal data buffer HIBI --> BUF (rx channel)\n" .
 "    ----------------------------------------------------------------------------\n" .
 "    if(r.rx.hibi_rxreq.re = '1' and agent_rxrsp_i.av = '0') then\n" .
-"      v.channels(rx_channel).data_buffer(to_integer(r.rx.context.buffer_index))\n" .
-"                                  := agent_rxrsp_i.data;\n" .
-"      v.rx.context.buffer_index   := r.rx.context.buffer_index + 1;\n" .
-"      v.rx.context.pull_count     := r.rx.context.pull_count - 1;\n" .
-"      v.rx.context.burst_count    := r.rx.context.burst_count - 1;\n" .                              
+"      v.channels(rx_channel).data_buffer(to_integer(r.rx.describtor.buffer_index))\n" .
+"                                     := agent_rxrsp_i.data;\n" .
+"      v.rx.describtor.buffer_index   := r.rx.describtor.buffer_index + 1;\n" .
+"      v.rx.describtor.pull_count     := r.rx.describtor.pull_count - 1;\n" .
+"      v.rx.describtor.burst_count    := r.rx.describtor.burst_count - 1;\n" .                              
 "    end if;\n" .
 "\n" .    
 "    ----------------------------------------------------------------------------\n" .
 "    -- read / ack from internal data buffer HIBI <-- BUF (tx channel)\n" .
 "    ----------------------------------------------------------------------------\n" .
 "    if(r.tx.hibi_txreq.we = '1' and r.tx.hibi_txreq.av = '0') then\n" .
-"      v.tx.context.buffer_index   := r.tx.context.buffer_index + 1;\n" .
-"      v.tx.context.push_count     := r.tx.context.push_count - 1;\n" .
-"      v.tx.context.burst_count    := r.tx.context.burst_count - 1;\n" .
+"      v.tx.describtor.buffer_index   := r.tx.describtor.buffer_index + 1;\n" .
+"      v.tx.describtor.push_count     := r.tx.describtor.push_count - 1;\n" .
+"      v.tx.describtor.burst_count    := r.tx.describtor.burst_count - 1;\n" .
 "    end if;\n" .
 "\n" .    
 "    ----------------------------------------------------------------------------\n" .
 "    -- read / ack from internal data buffer MEM <-- BUF (rx channel)\n" .
 "    ----------------------------------------------------------------------------\n" .
 "    if(mem_wait_i = '0') then\n" .
-"      if(r.rx.context.mem_req.en = '1') then\n" .
-"        v.rx.context.buffer_index   := r.rx.context.buffer_index + 1;\n" .
-"        v.rx.context.push_count     := r.rx.context.push_count - 1;\n" .
-"        v.rx.context.burst_count    := r.rx.context.burst_count - 1;\n" .
+"      if(r.rx.describtor.mem_req.en = '1') then\n" .
+"        v.rx.describtor.buffer_index := r.rx.describtor.buffer_index + 1;\n" .
+"        v.rx.describtor.push_count   := r.rx.describtor.push_count - 1;\n" .
+"        v.rx.describtor.burst_count  := r.rx.describtor.burst_count - 1;\n" .
 "      end if;\n" .
 "    end if;\n" .
 "\n" .    
@@ -349,16 +349,16 @@ print $fh
 "    ----------------------------------------------------------------------------\n" .
 "    act0: for i in 0 to $entity" . "_channels_c-1 loop\n" .
 "      if(ctrl_i(i).start = '1' and unsigned(cfg_i(i).count) /= 0) then\n" .
-"        v.channels(i).active                := '1';\n" .
-"        v.channels(i).status.busy           := '1';\n" .
-"        v.channels(i).context.pull_count    := unsigned(cfg_i(i).count);\n" .
-"        v.channels(i).context.push_count    := unsigned(cfg_i(i).count);\n" .
-"        v.channels(i).context.mem_req.addr  := unsigned(cfg_i(i).mem_addr);\n" .
-"        v.channels(i).context.mem_req.we    := not cfg_i(i).direction;\n" .
+"        v.channels(i).active                   := '1';\n" .
+"        v.channels(i).status.busy              := '1';\n" .
+"        v.channels(i).describtor.pull_count    := unsigned(cfg_i(i).count);\n" .
+"        v.channels(i).describtor.push_count    := unsigned(cfg_i(i).count);\n" .
+"        v.channels(i).describtor.mem_req.addr  := unsigned(cfg_i(i).mem_addr);\n" .
+"        v.channels(i).describtor.mem_req.we    := not cfg_i(i).direction;\n" .
 "\n" .        
-"        v.channels(i).context.burst_count   := to_unsigned(max_burst_length_c,  v.channels(i).context.burst_count'length);\n" .
+"        v.channels(i).describtor.burst_count   := to_unsigned(max_burst_length_c,  v.channels(i).describtor.burst_count'length);\n" .
 "        if(unsigned(cfg_i(i).count) < max_burst_length_c) then\n" .
-"          v.channels(i).context.burst_count := unsigned(cfg_i(i).count(v.channels(i).context.burst_count'range));\n" .
+"          v.channels(i).describtor.burst_count := unsigned(cfg_i(i).count(v.channels(i).describtor.burst_count'range));\n" .
 "        end if;\n" .
 "      end if;\n" .
 "    end loop act0;\n" .
@@ -374,91 +374,91 @@ print $fh
 "    ----------------------------------------------------------------------------\n" .
 "    case v.tx.state is\n" .
 "      when tx_idle         => if(unsigned(v_tx_arb_req) /= 0) then\n" .             
-"                                v.tx.state                  := context_switch;\n" .
+"                                v.tx.state                     := describtor_switch;\n" .
 "                              end if;\n" .
 "\n" .                              
-"      when context_switch  => v.tx.context                  := v.channels(tx_channel).context;\n" .
+"      when describtor_switch  => v.tx.describtor               := v.channels(tx_channel).describtor;\n" .
 "\n" .      
-"                              v.tx.context.burst_count      := to_unsigned(max_burst_length_c, v.tx.context.burst_count'length);\n" .
-"                              if(v.tx.context.pull_count < max_burst_length_c) then\n" .
-"                                v.tx.context.burst_count    := v.tx.context.pull_count(v.tx.context.burst_count'range);\n" .
+"                              v.tx.describtor.burst_count      := to_unsigned(max_burst_length_c, v.tx.describtor.burst_count'length);\n" .
+"                              if(v.tx.describtor.pull_count < max_burst_length_c) then\n" .
+"                                v.tx.describtor.burst_count    := v.tx.describtor.pull_count(v.tx.describtor.burst_count'range);\n" .
 "                              end if;\n" .
 "\n" .                                
-"                              v.tx.state                    := pull_mem;\n" .
-"                              v.tx.context.mem_req.en       := '1';\n" .
-"                              v.tx.lock_mem                 := '1';\n" .
+"                              v.tx.state                       := pull_mem;\n" .
+"                              v.tx.describtor.mem_req.en       := '1';\n" .
+"                              v.tx.lock_mem                    := '1';\n" .
 "\n" .                               
 "                              if(mem_wait_i = '1' or r.rx.lock_mem = '1') then\n" .
-"                                v.tx.state                  := wait_pull_mem;\n" .
-"                                v.tx.context.mem_req.en     := '0';\n" .
-"                                v.tx.lock_mem               := '0';\n" .
+"                                v.tx.state                     := wait_pull_mem;\n" .
+"                                v.tx.describtor.mem_req.en     := '0';\n" .
+"                                v.tx.lock_mem                  := '0';\n" .
 "                              end if;\n" .
 "\n" .                
 "      when wait_pull_mem   => if(mem_wait_i = '0' and r.rx.lock_mem = '0') then\n" .
-"                                v.tx.state                  := pull_mem;\n" .
-"                                v.tx.context.mem_req.en     := '1';\n" .
-"                                v.tx.lock_mem               := '1';\n" . 
+"                                v.tx.state                     := pull_mem;\n" .
+"                                v.tx.describtor.mem_req.en     := '1';\n" .
+"                                v.tx.lock_mem                  := '1';\n" . 
 "                              end if;\n" .
 "\n" .    
 "      when pull_mem        => if(mem_wait_i = '0') then\n" .
 "                                if(cfg_i(tx_channel).const_addr = '0') then\n" .
-"                                  v.tx.context.mem_req.addr := r.tx.context.mem_req.addr + 4;\n" .
+"                                  v.tx.describtor.mem_req.addr := r.tx.describtor.mem_req.addr + 4;\n" .
 "                                end if;\n" .
 "\n" .
-"                                if(v.tx.context.burst_count = 1) then\n" .
-"                                  v.tx.state                := last_pull_mem;\n" .
-"                                  v.tx.context.mem_req.en   := '0';\n" .
-"                                  v.tx.lock_mem             := '0';\n" .
+"                                if(v.tx.describtor.burst_count = 1) then\n" .
+"                                  v.tx.state                   := last_pull_mem;\n" .
+"                                  v.tx.describtor.mem_req.en   := '0';\n" .
+"                                  v.tx.lock_mem                := '0';\n" .
 "                                end if;\n" .
 "                              end if;\n" .
 "\n" .                              
 "      when last_pull_mem   => if(mem_wait_i = '0') then\n" .
-"                                v.tx.hibi_txreq.we          := '1';\n" .
-"                                v.tx.hibi_txreq.av          := '1';\n" .
-"                                v.tx.hibi_txreq.comm        := cfg_i(tx_channel).cmd;\n" .
-"                                v.tx.state                  := push_hibi;\n" .
+"                                v.tx.hibi_txreq.we             := '1';\n" .
+"                                v.tx.hibi_txreq.av             := '1';\n" .
+"                                v.tx.hibi_txreq.comm           := cfg_i(tx_channel).cmd;\n" .
+"                                v.tx.state                     := push_hibi;\n" .
 "\n" .
-"                                v.tx.context.buffer_index   := (others=>'0');\n" .
-"                                v.tx.context.burst_count    := to_unsigned(max_burst_length_c, v.tx.context.burst_count'length);\n" .
-"                                if(v.tx.context.push_count < max_burst_length_c) then\n" .
-"                                  v.tx.context.burst_count  := v.tx.context.push_count(v.tx.context.burst_count'range);\n" .
+"                                v.tx.describtor.buffer_index   := (others=>'0');\n" .
+"                                v.tx.describtor.burst_count    := to_unsigned(max_burst_length_c, v.tx.describtor.burst_count'length);\n" .
+"                                if(v.tx.describtor.push_count < max_burst_length_c) then\n" .
+"                                  v.tx.describtor.burst_count  := v.tx.describtor.push_count(v.tx.describtor.burst_count'range);\n" .
 "                                end if;\n" .
 "\n" .                               
 "                                if(agent_txrsp_i.full = '1') then\n" .
-"                                  v.tx.state                := wait_push_hibi;\n" .
-"                                  v.tx.hibi_txreq.we        := '0';\n" .
+"                                  v.tx.state                   := wait_push_hibi;\n" .
+"                                  v.tx.hibi_txreq.we           := '0';\n" .
 "                                end if;\n" .
 "                              end if;\n" .
 "\n" .    
 "      when wait_push_hibi  => if(agent_txrsp_i.full = '0') then\n" .
-"                                v.tx.state                  := push_hibi;\n" .
-"                                v.tx.hibi_txreq.we          := '1';\n" .
+"                                v.tx.state                     := push_hibi;\n" .
+"                                v.tx.hibi_txreq.we             := '1';\n" .
 "                              end if;\n" .
 "\n" .
-"      when push_hibi       => v.tx.hibi_txreq.av            := '0';\n" .
+"      when push_hibi       => v.tx.hibi_txreq.av               := '0';\n" .
 "\n" .      
 "                              if(agent_txrsp_i.full = '1' or (r.tx.hibi_txreq.we = '1' and agent_txrsp_i.almost_full = '1')) then\n" .
-"                                v.tx.hibi_txreq.we          := '0';\n" .
+"                                v.tx.hibi_txreq.we             := '0';\n" .
 "                              else\n" .
-"                                v.tx.hibi_txreq.we          := '1';\n" .
+"                                v.tx.hibi_txreq.we             := '1';\n" .
 "                              end if;\n" .
 "\n" .                             
 "                              --------------------------------------------------\n" .
 "                              -- deassert active one cycle before last transfer\n" .
 "                              -- as it must be deasserted before the arbiter ack\n" .
 "                              --------------------------------------------------\n" .
-"                              if(v.tx.context.burst_count = 1 and v.tx.context.push_count = 1) then\n" .
+"                              if(v.tx.describtor.burst_count = 1 and v.tx.describtor.push_count = 1) then\n" .
 "                                v.channels(tx_channel).active        := '0';\n" .
 "                              end if;\n" .
 "\n" .                              
-"                              if(v.tx.context.burst_count = 0) then\n" .
-"                                v.tx.context.buffer_index            := (others=>'0');\n" .
-"                                v.channels(tx_channel).context       := v.tx.context;\n" .
-"                                v.tx.state                           := context_switch;\n" .
+"                              if(v.tx.describtor.burst_count = 0) then\n" .
+"                                v.tx.describtor.buffer_index         := (others=>'0');\n" .
+"                                v.channels(tx_channel).describtor    := v.tx.describtor;\n" .
+"                                v.tx.state                           := describtor_switch;\n" .
 "                                v.tx.hibi_txreq.we                   := '0';\n" .
 "                                v_tx_arb_ack                         := '1';\n" .
 "\n" .                                 
-"                                if(v.tx.context.push_count = 0) then\n" .
+"                                if(v.tx.describtor.push_count = 0) then\n" .
 "                                  v.channels(tx_channel).status.busy := '0';\n" .
 "                                  v.channels(tx_channel).active      := '0';\n" .
 "                                  v.tx.state                         := tx_idle;\n" .
@@ -476,7 +476,7 @@ print $fh
 "    case v.rx.state is\n" .
 "      when rx_idle         => if(unsigned(get_rx_channels(r.channels)) /= 0) then\n" .
 "                                v.rx.curr_channel             := lsb_set(get_rx_channels(r.channels));\n" .
-"                                v.rx.context                  := r.channels(to_integer(unsigned(v.rx.curr_channel))).context;\n" .
+"                                v.rx.describtor               := r.channels(to_integer(unsigned(v.rx.curr_channel))).describtor;\n" .
 "\n" .                                
 "                                if(agent_rxrsp_i.empty = '1') then\n" .
 "                                  v.rx.state                  := wait_pull_hibi;\n" .
@@ -499,68 +499,68 @@ print $fh
 "                              end if;\n" .
 "\n" .                              
 "                              if(agent_rxrsp_i.av = '1') then\n" .
-"                                v.rx.curr_channel                := agent_rxrsp_i.data(v.rx.curr_channel'range);\n" .
+"                                v.rx.curr_channel             := agent_rxrsp_i.data(v.rx.curr_channel'range);\n" .
 "\n" .                                
-"                                if(v.channels(next_rx_channel).context.mem_req.we = '0') then\n" .
-"                                  v.rx.state                     := rx_error;\n" .
+"                                if(v.channels(next_rx_channel).describtor.mem_req.we = '0') then\n" .
+"                                  v.rx.state                  := rx_error;\n" .
 "                                end if;\n" .
 "\n" .                               
 "                                if(v.rx.curr_channel /= r.rx.curr_channel) then\n" .
-"                                  v.channels(rx_channel).context := r.rx.context;\n" .
-"                                  v.rx.context                   := r.channels(next_rx_channel).context;\n" .
+"                                  v.channels(rx_channel).describtor := r.rx.describtor;\n" .
+"                                  v.rx.describtor                   := r.channels(next_rx_channel).describtor;\n" .
 "                                end if;\n" .
 "                              else\n" .
-"                                if(v.rx.context.burst_count = 0) then\n" .
-"                                  v.rx.state                     := push_mem;\n" .
-"                                  v.rx.hibi_rxreq                := dflt_agent_rxreq_c;\n" .
-"                                  v.rx.context.mem_req.en        := '1';\n" .
-"                                  v.rx.lock_mem                  := '1';\n" .
+"                                if(v.rx.describtor.burst_count = 0) then\n" .
+"                                  v.rx.state                        := push_mem;\n" .
+"                                  v.rx.hibi_rxreq                   := dflt_agent_rxreq_c;\n" .
+"                                  v.rx.describtor.mem_req.en        := '1';\n" .
+"                                  v.rx.lock_mem                     := '1';\n" .
 "\n" .                                 
 "                                  if(mem_wait_i = '1' or v.tx.lock_mem = '1' or r.tx.lock_mem = '1') then\n" .
-"                                    v.rx.state                   := wait_push_mem;\n" .
-"                                    v.rx.context.mem_req.en      := '0';\n" .
-"                                    v.rx.lock_mem                := '0';\n" .
+"                                    v.rx.state                      := wait_push_mem;\n" .
+"                                    v.rx.describtor.mem_req.en      := '0';\n" .
+"                                    v.rx.lock_mem                   := '0';\n" .
 "                                  end if;\n" .
 "\n" .                                 
-"                                  v.rx.context.buffer_index      := (others=>'0');\n" .
-"                                  v.rx.context.burst_count       := to_unsigned(max_burst_length_c, v.rx.context.burst_count'length);\n" .
-"                                  if(v.rx.context.push_count < max_burst_length_c) then\n" .
-"                                    v.rx.context.burst_count     := v.rx.context.push_count(v.rx.context.burst_count'range);\n" .
+"                                  v.rx.describtor.buffer_index      := (others=>'0');\n" .
+"                                  v.rx.describtor.burst_count       := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);\n" .
+"                                  if(v.rx.describtor.push_count < max_burst_length_c) then\n" .
+"                                    v.rx.describtor.burst_count     := v.rx.describtor.push_count(v.rx.describtor.burst_count'range);\n" .
 "                                  end if;\n" .
 "                                end if;\n" .
 "                              end if;\n" .
 "\n" .                              
 "      when wait_push_mem   => if(mem_wait_i = '0' and v.tx.lock_mem = '0' and r.tx.lock_mem = '0') then\n" .
-"                                v.rx.state                    := push_mem;\n" .
-"                                v.rx.context.mem_req.en       := '1';\n" .
-"                                v.rx.lock_mem                 := '1';\n" .
+"                                v.rx.state                          := push_mem;\n" .
+"                                v.rx.describtor.mem_req.en          := '1';\n" .
+"                                v.rx.lock_mem                       := '1';\n" .
 "                              end if;\n" .
 "\n" .                            
 "      when push_mem        => if(mem_wait_i = '0') then\n" .
 "                                if(cfg_i(rx_channel).const_addr = '0') then\n" .
-"                                  v.rx.context.mem_req.addr   := r.rx.context.mem_req.addr + 4;\n" .
+"                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 4;\n" .
 "                                end if;\n" .
 "\n" .                             
-"                                if(v.rx.context.burst_count = 0) then\n" .
-"                                  v.rx.state                  := pull_hibi;\n" .
-"                                  v.rx.hibi_rxreq.re          := '1';\n" .
-"                                  v.rx.context.mem_req.en     := '0';\n" .
-"                                  v.rx.lock_mem               := '0';\n" .
+"                                if(v.rx.describtor.burst_count = 0) then\n" .
+"                                  v.rx.state                        := pull_hibi;\n" .
+"                                  v.rx.hibi_rxreq.re                := '1';\n" .
+"                                  v.rx.describtor.mem_req.en        := '0';\n" .
+"                                  v.rx.lock_mem                     := '0';\n" .
 "\n" .                             
-"                                  v.rx.context.buffer_index   := (others=>'0');\n" .    
-"                                  v.rx.context.burst_count    := to_unsigned(max_burst_length_c, v.rx.context.burst_count'length);\n" .
-"                                  if(v.rx.context.pull_count < max_burst_length_c) then\n" .
-"                                    v.rx.context.burst_count  := v.rx.context.pull_count(v.rx.context.burst_count'range);\n" .
+"                                  v.rx.describtor.buffer_index      := (others=>'0');\n" .    
+"                                  v.rx.describtor.burst_count       := to_unsigned(max_burst_length_c, v.rx.describtor.burst_count'length);\n" .
+"                                  if(v.rx.describtor.pull_count < max_burst_length_c) then\n" .
+"                                    v.rx.describtor.burst_count     := v.rx.describtor.pull_count(v.rx.describtor.burst_count'range);\n" .
 "                                  end if;\n" .
 "\n" .                                                                  
 "                                  if(agent_rxrsp_i.empty = '1') then\n" .
-"                                    v.rx.state                := wait_pull_hibi;\n" .
-"                                    v.rx.hibi_rxreq.re        := '0';\n" .
+"                                    v.rx.state                      := wait_pull_hibi;\n" .
+"                                    v.rx.hibi_rxreq.re              := '0';\n" .
 "                                  end if;\n" .
 "\n" .                                 
-"                                  if(v.rx.context.push_count = 0) then\n" .
-"                                    v.rx.state                := rx_idle;\n" .
-"                                    v.rx.context.mem_req      := dflt_mem_req_c;\n" .
+"                                  if(v.rx.describtor.push_count = 0) then\n" .
+"                                    v.rx.state                      := rx_idle;\n" .
+"                                    v.rx.describtor.mem_req         := dflt_mem_req_c;\n" .
 "\n" .
 "                                    v.channels(rx_channel).status.busy := '0';\n" .
 "                                    v.channels(rx_channel).active      := '0';\n" .
@@ -580,12 +580,12 @@ print $fh
 "    ----------------------------------------------------------------------------\n" .
 "    -- mem rx data multiplexing\n" .
 "    ----------------------------------------------------------------------------\n" .
-"    v.data                 := v.channels(rx_channel).data_buffer(to_integer(v.rx.context.buffer_index));\n" .
+"    v.data                 := v.channels(rx_channel).data_buffer(to_integer(v.rx.describtor.buffer_index));\n" .
 "\n" .    
 "    ----------------------------------------------------------------------------\n" .
 "    -- hibi tx data multiplexing\n" .
 "    ----------------------------------------------------------------------------\n" .
-"    v.tx.hibi_txreq.data   := v.channels(tx_channel).data_buffer(to_integer(v.tx.context.buffer_index));\n" .
+"    v.tx.hibi_txreq.data   := v.channels(tx_channel).data_buffer(to_integer(v.tx.describtor.buffer_index));\n" .
 "    if(v.tx.hibi_txreq.av = '1') then\n" .
 "      v.tx.hibi_txreq.data := std_ulogic_vector(resize(unsigned(cfg_i(tx_channel).hibi_addr), v.tx.hibi_txreq.data'length));\n" .
 "    end if;\n" .
@@ -594,9 +594,9 @@ print $fh
 "    -- memory request mux\n" .
 "    ----------------------------------------------------------------------------\n" .
 "    if(r.tx.lock_mem = '1') then\n" .
-"      mem_req := r.tx.context.mem_req;\n" .
+"      mem_req := r.tx.describtor.mem_req;\n" .
 "    else\n" .
-"      mem_req := r.rx.context.mem_req;\n" .
+"      mem_req := r.rx.describtor.mem_req;\n" .
 "    end if;\n" .
 "\n" .    
 "    ----------------------------------------------------------------------------\n" .

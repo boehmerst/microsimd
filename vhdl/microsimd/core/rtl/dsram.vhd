@@ -22,7 +22,7 @@ architecture beh of dsram is
 
   type ram_t is array(2**size_g-1 downto 0) of std_ulogic_vector(width_g - 1 downto 0);
   
-  signal ram :  ram_t;
+  signal ram :  ram_t := (others => (others => '0'));
 
 begin
   -----------------------------------------------------------------------------

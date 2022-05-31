@@ -92,6 +92,8 @@ print $fh
 "  rd    => '0'\n" .
 ");" .
 "\n\n" .
+"type $base" . "_gif_req_arr_t is array(natural range <>) of $req_type;" . 
+"\n\n" .
 "type $rsp_type is record\n" .
 "  rdata : std_ulogic_vector($base" . "_data_width_c-1 downto 0);\n" .
 "  ack   : std_ulogic;\n" .
@@ -100,6 +102,8 @@ print $fh
 "  rdata => (others=>'0'),\n" .
 "  ack   => '0'\n" .
 ");" .
+"\n\n" .
+"type $base" . "_gif_rsp_arr_t is array(natural range <>) of $rsp_type;" .
 "\n\n" .
 "end package $package;\n" .
 "\n";

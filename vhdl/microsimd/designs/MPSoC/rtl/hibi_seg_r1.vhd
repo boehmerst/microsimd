@@ -55,7 +55,7 @@ architecture rtl of hibi_seg_r1 is
   -----------------------------------------------------------------------------
   type hibi_addr_array_t is array (0 to 3) of integer;
   constant hibi_addresses_c : hibi_addr_array_t :=(
-    16#1000#, 16#3000#, 16#5000#, 16#7000# 
+    16#1000#, 16#3000#, 16#5000#, 16#7000#
   );
 
   type comm_array_t is array(natural range 0 to n_agents_g-1) of std_logic_vector(comm_width_g-1 downto 0);

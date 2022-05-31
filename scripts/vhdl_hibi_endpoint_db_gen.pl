@@ -14,6 +14,7 @@ my $mem_addr_width  = 32;
 my $count_width     = 10;
 my $channels        =  4;
 my $chaining;
+my $gpio;
 
 # command line options table
 my %option = 
@@ -22,7 +23,8 @@ my %option =
     'mem_addr_width'   => { 'string' => 'mem_addr_width|maw=i',   'ref' => \$mem_addr_width,  'help' => 'Specify memory address width'       },
     'count_width'      => { 'string' => 'count_width|cnt=i',      'ref' => \$count_width,     'help' => 'Specify transfer counter width'     },
     'channels'         => { 'string' => 'channels|ch=i',          'ref' => \$channels,        'help' => 'Specify number of channels'         },
-    'chaining'         => { 'string' => 'chaining|chn',           'ref' => \$chaining,        'help' => 'Support for chaining DMA transfers' },       
+    'chaining'         => { 'string' => 'chaining|chn',           'ref' => \$chaining,        'help' => 'Support for chaining DMA transfers' },
+    'gpio'             => { 'string' => 'gpio|g',                 'ref' => \$gpio,            'help' => 'Support for GPIO'                   },
     'help'             => { 'string' => 'help|?',                 'ref' => \&help,            'help' => 'Show help'                          },
   );
 
@@ -33,6 +35,7 @@ GetOptions( $option{'entity'}          {'string'} => $option{'entity'}          
             $option{'count_width'}     {'string'} => $option{'count_width'}     {'ref'},
             $option{'channels'}        {'string'} => $option{'channels'}        {'ref'},
             $option{'chaining'}        {'string'} => $option{'chaining'}        {'ref'},
+	    $option{'gpio'}            {'string'} => $option{'gpio'}            {'ref'},
             $option{'help'}            {'string'} => $option{'help'}            {'ref'},          
           ) or die;
 
@@ -124,7 +127,7 @@ printf $fh
 # channel register
 for(my $i = 0; $i < $channels; $i++) {
   printf $fh (
-    "my \$ref_cfg$i = {\n  offset => 0x%02x,\n", 4*$i+4);
+    "my \$ref_cfg$i = {\n  offset => 0x%02x,\n", 4*$i+3);
   printf $fh
     "  name   => 'HIBI_DMA_CFG$i" . "',\n" .
     "  desc   => 'configuration register',\n" .
@@ -140,7 +143,7 @@ for(my $i = 0; $i < $channels; $i++) {
     "\n";
 
   printf $fh (
-    "my \$ref_dma_addr$i = {\n  offset => 0x%02x,\n", 4*$i+4+1);
+    "my \$ref_dma_addr$i = {\n  offset => 0x%02x,\n", 4*$i+3+1);
   printf $fh
     "  name   => 'HIBI_DMA_MEM_ADDR$i" . "',\n" .
     "  desc   => 'memory address',\n" .
@@ -152,7 +155,7 @@ for(my $i = 0; $i < $channels; $i++) {
 "\n";
 
   printf $fh (
-    "my \$ref_hibi_addr$i = {\n  offset => 0x%02x,\n", 4*$i+4+2);
+    "my \$ref_hibi_addr$i = {\n  offset => 0x%02x,\n", 4*$i+3+2);
   printf $fh
     "  name   => 'HIBI_DMA_HIBI_ADDR$i" . "',\n" .
     "  desc   => 'hibi address',\n" .
@@ -166,7 +169,7 @@ for(my $i = 0; $i < $channels; $i++) {
 
   if(defined($chaining)) {
     printf $fh (
-      "my \$ref_trig_mask$i = {\n  offset => 0x%02x,\n", 4*$i+4+3);
+      "my \$ref_trig_mask$i = {\n  offset => 0x%02x,\n", 4*$i+3+3);
     printf $fh
       "  name   => 'HIBI_DMA_TRIGGER_MASK$i" . "',\n" .
       "  desc   => 'trigger mask for DMA chaining',\n" .
@@ -178,6 +181,69 @@ for(my $i = 0; $i < $channels; $i++) {
       "\n";  
   }
 }
+
+
+my $gpio_offset = 4*$channels+3;
+
+if(defined($gpio)) {
+  printf $fh (
+    "my \$ref_gpio = {\n  offset =>  0x%02x,\n", $gpio_offset);
+  printf $fh
+    "  name  => 'HIBI_DMA_GPIO',\n" .
+    "  desc  => 'general purpose I/O',\n" .
+    "  fld   => [\n";
+  print $fh "    { name => 'GPIO_0',    slc => [ 0,  0], type => 'xrw', rst => 0x00, desc => 'GPIO0'},\n" .
+            "    { name => 'GPIO_1',    slc => [ 1,  1], type => 'xrw', rst => 0x00, desc => 'GPIO1'},\n" .
+	    "    { name => 'GPIO_2',    slc => [ 2,  2], type => 'xrw', rst => 0x00, desc => 'GPIO2'},\n" .
+	    "    { name => 'GPIO_3',    slc => [ 3,  3], type => 'xrw', rst => 0x00, desc => 'GPIO3'},\n" .
+            "    { name => 'GPIO_4',    slc => [ 4,  4], type => 'xrw', rst => 0x00, desc => 'GPIO4'},\n" .
+            "    { name => 'GPIO_5',    slc => [ 5,  5], type => 'xrw', rst => 0x00, desc => 'GPIO5'},\n" .
+	    "    { name => 'GPIO_6',    slc => [ 6,  6], type => 'xrw', rst => 0x00, desc => 'GPIO6'},\n" .
+	    "    { name => 'GPIO_7',    slc => [ 7,  7], type => 'xrw', rst => 0x00, desc => 'GPIO7'},\n" .
+            "    { name => 'GPIO_8',    slc => [ 8,  8], type => 'xrw', rst => 0x00, desc => 'GPIO8'},\n" .
+            "    { name => 'GPIO_9',    slc => [ 9,  9], type => 'xrw', rst => 0x00, desc => 'GPIO9'},\n" .
+	    "    { name => 'GPIO_A',    slc => [10, 10], type => 'xrw', rst => 0x00, desc => 'GPIOA'},\n" .
+	    "    { name => 'GPIO_B',    slc => [11, 11], type => 'xrw', rst => 0x00, desc => 'GPIOB'},\n" .
+            "    { name => 'GPIO_C',    slc => [12, 12], type => 'xrw', rst => 0x00, desc => 'GPIOC'},\n" .
+            "    { name => 'GPIO_D',    slc => [13, 13], type => 'xrw', rst => 0x00, desc => 'GPIOD'},\n" .
+	    "    { name => 'GPIO_E',    slc => [14, 14], type => 'xrw', rst => 0x00, desc => 'GPIOE'},\n" .
+	    "    { name => 'GPIO_F',    slc => [15, 15], type => 'xrw', rst => 0x00, desc => 'GPIOF'},\n" .
+	    "\n";
+  printf $fh
+    "  ]\n" .
+    "};\n" .
+    "\n";  
+
+
+  printf $fh (
+    "my \$ref_gpio_dir = {\n  offset => 0x%02x,\n", $gpio_offset+1);
+  printf $fh
+    "  name  => 'HIBI_DMA_GPIO_DIR',\n" .
+    "  desc  => 'general purpose I/O',\n" .
+    "  fld   => [\n";
+  print $fh "    { name => 'GPIO_0',    slc => [ 0,  0], type => 'rw', rst => 0x00, desc => 'GPIO0'},\n" .
+            "    { name => 'GPIO_1',    slc => [ 1,  1], type => 'rw', rst => 0x00, desc => 'GPIO1'},\n" .
+	    "    { name => 'GPIO_2',    slc => [ 2,  2], type => 'rw', rst => 0x00, desc => 'GPIO2'},\n" .
+	    "    { name => 'GPIO_3',    slc => [ 3,  3], type => 'rw', rst => 0x00, desc => 'GPIO3'},\n" .
+            "    { name => 'GPIO_4',    slc => [ 4,  4], type => 'rw', rst => 0x00, desc => 'GPIO4'},\n" .
+            "    { name => 'GPIO_5',    slc => [ 5,  5], type => 'rw', rst => 0x00, desc => 'GPIO5'},\n" .
+	    "    { name => 'GPIO_6',    slc => [ 6,  6], type => 'rw', rst => 0x00, desc => 'GPIO6'},\n" .
+	    "    { name => 'GPIO_7',    slc => [ 7,  7], type => 'rw', rst => 0x00, desc => 'GPIO7'},\n" .
+            "    { name => 'GPIO_8',    slc => [ 8,  8], type => 'rw', rst => 0x00, desc => 'GPIO8'},\n" .
+            "    { name => 'GPIO_9',    slc => [ 9,  9], type => 'rw', rst => 0x00, desc => 'GPIO9'},\n" .
+	    "    { name => 'GPIO_A',    slc => [10, 10], type => 'rw', rst => 0x00, desc => 'GPIOA'},\n" .
+	    "    { name => 'GPIO_B',    slc => [11, 11], type => 'rw', rst => 0x00, desc => 'GPIOB'},\n" .
+            "    { name => 'GPIO_C',    slc => [12, 12], type => 'rw', rst => 0x00, desc => 'GPIOC'},\n" .
+            "    { name => 'GPIO_D',    slc => [13, 13], type => 'rw', rst => 0x00, desc => 'GPIOD'},\n" .
+	    "    { name => 'GPIO_E',    slc => [14, 14], type => 'rw', rst => 0x00, desc => 'GPIOE'},\n" .
+	    "    { name => 'GPIO_F',    slc => [15, 15], type => 'rw', rst => 0x00, desc => 'GPIOF'},\n" .
+	    "\n";
+  printf $fh
+    "  ]\n" .
+    "};\n" .
+    "\n";  
+}
+
 
 #descriptor
 printf $fh
@@ -198,6 +264,11 @@ for(my $i = 0; $i < $channels; $i++) {
   }
 }
 
+if(defined($gpio)) {
+print $fh
+"  \$ref_gpio,\n" .
+"  \$ref_gpio_dir,\n";
+}
 
 print $fh
 "];\n" .

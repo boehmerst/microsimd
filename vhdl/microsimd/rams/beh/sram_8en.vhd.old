@@ -21,12 +21,12 @@ entity sram_8en is
     size_g  : positive := 16
   );
   port (
-    clk_i : in  std_ulogic;
-    wre_i : in  std_ulogic_vector(width_g/8-1 downto 0);     
-    ena_i : in  std_ulogic;
-    adr_i : in  std_ulogic_vector(size_g-1 downto 0);
-    dat_i : in  std_ulogic_vector(width_g-1 downto 0);
-    dat_o : out std_ulogic_vector(width_g-1 downto 0)
+    clk_i  : in  std_ulogic;
+    wre_i  : in  std_ulogic_vector(width_g/8-1 downto 0);     
+    ena_i  : in  std_ulogic;
+    addr_i : in  std_ulogic_vector(size_g-1 downto 0);
+    dat_i  : in  std_ulogic_vector(width_g-1 downto 0);
+    dat_o  : out std_ulogic_vector(width_g-1 downto 0)
   );
 end entity sram_8en;
 
@@ -42,13 +42,13 @@ architecture beh of sram_8en is
   signal di  : sel_t;
   
 begin
-  process(wre_i, dat_i, adr_i)
+  process(wre_i, dat_i, addr_i)
   begin
     for i in 0 to width_g/8 - 1 loop
       if wre_i(i) = '1' then
         di(i) <= dat_i((i+1)*8 - 1 downto i*8);
       else
-        di(i) <= ram(to_integer(unsigned(adr_i)))((i+1)*8-1 downto i*8);
+        di(i) <= ram(to_integer(unsigned(addr_i)))((i+1)*8-1 downto i*8);
       end if;
     end loop;
   end process;
@@ -57,7 +57,7 @@ begin
   begin
     if rising_edge(clk_i) then
       if ena_i = '1' then
-        ram(to_integer(unsigned(adr_i))) <= di(7) & di(6) & di(5) & di(4) & di(3) & di(2) & di(1) & di(0);
+        ram(to_integer(unsigned(addr_i))) <= di(7) & di(6) & di(5) & di(4) & di(3) & di(2) & di(1) & di(0);
         dat_o <= di(7) & di(6) & di(5) & di(4) & di(3) & di(2) & di(1) & di(0);
       end if;
     end if;

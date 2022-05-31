@@ -19,19 +19,21 @@ entity hibi_pif is
     nr_txstreams_g      : integer range 1 to 4 := 1
   );
   port (
-    clk_i             : in  std_ulogic;
-    reset_n_i         : in  std_ulogic;
-    rxpif_reset_n_i   : in  std_ulogic_vector(nr_rxstreams_g-1 downto 0);
-    pif_i             : in  hibi_pif_arr_t(0 to nr_rxstreams_g-1);
-    pif_o             : out hibi_pif_arr_t(0 to nr_txstreams_g-1);  
-    agent_txreq_o     : out agent_txreq_t;
-    agent_txrsp_i     : in  agent_txrsp_t;
-    agent_rxreq_o     : out agent_rxreq_t;
-    agent_rxrsp_i     : in  agent_rxrsp_t;
-    agent_msg_txreq_o : out agent_txreq_t;
-    agent_msg_txrsp_i : in  agent_txrsp_t;
-    agent_msg_rxreq_o : out agent_rxreq_t;
-    agent_msg_rxrsp_i : in  agent_rxrsp_t
+    clk_i               : in  std_ulogic;
+    reset_n_i           : in  std_ulogic;
+    rxpif_reset_n_i     : in  std_ulogic_vector(nr_rxstreams_g-1 downto 0);
+    en_i                : in  std_ulogic;
+    init_i              : in  std_ulogic;
+    pif_i               : in  hibi_pif_arr_t(0 to nr_rxstreams_g-1);
+    pif_o               : out hibi_pif_arr_t(0 to nr_txstreams_g-1);  
+    agent_txreq_o       : out agent_txreq_t;
+    agent_txrsp_i       : in  agent_txrsp_t;
+    agent_rxreq_o       : out agent_rxreq_t;
+    agent_rxrsp_i       : in  agent_rxrsp_t;
+    agent_msg_txreq_o   : out agent_txreq_t;
+    agent_msg_txrsp_i   : in  agent_txrsp_t;
+    agent_msg_rxreq_o   : out agent_rxreq_t;
+    agent_msg_rxrsp_i   : in  agent_rxrsp_t
   );
 end entity hibi_pif;
 
@@ -172,8 +174,8 @@ begin
     port map (
       clk_i              => clk_i,
       reset_n_i          => reset_n_i,
-      init_i             => '0',
-      en_i               => '1',
+      init_i             => init_i,
+      en_i               => en_i,
       gif_req_o          => ctrli0_gif_req,
       gif_rsp_i          => regifi0_gif_rsp,
       agent_msg_txreq_o  => agent_msg_txreq_o,

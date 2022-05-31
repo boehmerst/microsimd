@@ -3,7 +3,7 @@
 -- Project    :
 -------------------------------------------------------------------------------
 -- File       : hibi_dma.vhd
--- Author     : boehmers
+-- Author     : deboehse
 -- Company    : private
 -- Created    : 
 -- Last update: 
@@ -25,9 +25,11 @@ use ieee.numeric_std.all;
 
 library microsimd;
 use microsimd.hibi_link_pkg.all;
-use microsimd.hibi_dma_pkg.all;
-use microsimd.hibi_dma_regif_types_pkg.all;
-use microsimd.hibi_dma_regfile_pkg.all;
+
+library work;
+use work.hibi_dma_pkg.all;
+use work.hibi_dma_regif_types_pkg.all;
+use work.hibi_dma_regfile_pkg.all;
 
 entity hibi_dma is
   generic (
@@ -40,6 +42,9 @@ entity hibi_dma is
     init_i            : in  std_ulogic;
     ext_gif_req_i     : in  hibi_dma_gif_req_t;
     ext_gif_rsp_o     : out hibi_dma_gif_rsp_t;
+    gpio_o            : out hibi_dma_HIBI_DMA_GPIO_reg2logic_t;
+    gpio_i            : in  hibi_dma_HIBI_DMA_GPIO_logic2reg_t;
+    gpio_dir_o        : out hibi_dma_HIBI_DMA_GPIO_DIR_reg2logic_t;
     mem_req_o         : out hibi_dma_mem_req_t;
     mem_rsp_i         : in  hibi_dma_mem_rsp_t;
     mem_wait_i        : in  std_ulogic;
@@ -85,7 +90,7 @@ begin
   ------------------------------------------------------------------------------
   -- hibi dma register file
   ------------------------------------------------------------------------------
-  regifi0: entity microsimd.hibi_dma_regfile
+  regifi0: entity work.hibi_dma_regfile
     port map (
       clk_i       => clk_i,
       reset_n_i   => reset_n_i,
@@ -140,7 +145,7 @@ begin
   ------------------------------------------------------------------------------
   status_o <= dmai0_status;
 
-  dmai0: entity microsimd.hibi_dma_core
+  dmai0: entity work.hibi_dma_core
     generic map (
       log2_burst_length_g => log2_burst_length_g
     )
@@ -164,7 +169,7 @@ begin
   ----------------------------------------------------------------------------
   -- hibi_mem_ctrl
   ----------------------------------------------------------------------------
-  ctrli0: entity microsimd.hibi_dma_ctrl
+  ctrli0: entity work.hibi_dma_ctrl
     port map (
       clk_i              => clk_i,
       reset_n_i          => reset_n_i,
@@ -181,7 +186,7 @@ begin
   -----------------------------------------------------------------------------
   -- gif mux interface
   -----------------------------------------------------------------------------
-  muxi0: entity microsimd.hibi_dma_gif_mux
+  muxi0: entity work.hibi_dma_gif_mux
     port map (
       clk_i         => clk_i,
       reset_n_i     => reset_n_i,
@@ -233,6 +238,10 @@ begin
   dma_cfg(3).direction               <= regifi0_reg2logic.HIBI_DMA_CFG3.rw.direction;
   dma_cfg(3).const_addr              <= regifi0_reg2logic.HIBI_DMA_CFG3.rw.const_addr;
   dma_cfg(3).cmd                     <= regifi0_reg2logic.HIBI_DMA_CFG3.rw.hibi_cmd;
+
+  gpio_o                  <= regifi0_reg2logic.HIBI_DMA_GPIO;
+  gpio_dir_o              <= regifi0_reg2logic.HIBI_DMA_GPIO_DIR;
+  logic2reg.HIBI_DMA_GPIO <= gpio_i;
 
   ------------------------------------------------------------------------------
   -- dma enable and init logic
