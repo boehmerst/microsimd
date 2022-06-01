@@ -93,13 +93,15 @@ architecture beh of mpsoc_tb is
   -- enable HIBI bridge DMA
   -----------------------------------------------------------------------------
   procedure hibi_local_dma_enable(signal mst_req : out wb_req_t; signal slv_rsp : in wb_rsp_t; signal clk : in std_ulogic) is
-    variable addr : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
-    variable data : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
+    variable addr_word : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable addr_byte : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable data      : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
   begin
-    addr := addr_offset_HIBI_DMA_CTRL_slv_c;
-    data := (bit_offset_HIBI_DMA_CTRL_en_c => '1', others => '0');
+    addr_word := addr_offset_HIBI_DMA_CTRL_slv_c;
+    addr_byte := addr_word sll 2;
+    data      := (bit_offset_HIBI_DMA_CTRL_en_c => '1', others => '0');
     
-    wishbone_write(addr, data, mst_req, slv_rsp, clk);
+    wishbone_write(addr_byte, data, mst_req, slv_rsp, clk);
   end procedure hibi_local_dma_enable;
 
 
@@ -108,14 +110,16 @@ architecture beh of mpsoc_tb is
   -----------------------------------------------------------------------------
   procedure hibi_local_dma_transfer(constant channel : in natural; constant hibi_dest_addr : in std_ulogic_vector; constant mem_addr : in std_ulogic_vector; constant count : in positive;  
                                     constant direction : in hibi_dma_direction_t; constant hibi_cmd : in std_ulogic_vector; signal mst_req : out wb_req_t; signal slv_rsp : in wb_rsp_t; signal clk : in std_ulogic) is
-    variable offset : integer;
-    variable addr   : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
-    variable data   : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
-    variable cfg    : hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
+    variable offset    : integer;
+    variable addr_word : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable addr_byte : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable data      : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
+    variable cfg       : hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
   begin
 
     offset          := channel * 4;
-    addr            := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr'length));
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr_word'length));
+    addr_byte       := addr_word sll 2;
 
     cfg             := dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c;
     cfg.count       := std_ulogic_vector(to_unsigned(count, dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c.count'length));
@@ -135,15 +139,19 @@ architecture beh of mpsoc_tb is
     data(bit_offset_HIBI_DMA_CFG0_hibi_cmd_c + cfg.hibi_cmd'length-1 downto bit_offset_HIBI_DMA_CFG0_hibi_cmd_c) := cfg.hibi_cmd;
     data(bit_offset_HIBI_DMA_CFG0_const_addr_c)                                                                  := cfg.const_addr;
 
-    wishbone_write(addr, data, mst_req, slv_rsp, clk);
+    wishbone_write(addr_byte, data, mst_req, slv_rsp, clk);
 
-    addr := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_MEM_ADDR0_integer_c + offset, addr'length));
-    wishbone_write(addr, mem_addr, mst_req, slv_rsp, clk);
+    addr_word := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_MEM_ADDR0_integer_c + offset, addr_word'length));
+    addr_byte := addr_word sll 2;
+    wishbone_write(addr_byte, mem_addr, mst_req, slv_rsp, clk);
 
-    addr := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_HIBI_ADDR0_integer_c + offset, addr'length));
-    wishbone_write(addr, hibi_dest_addr, mst_req, slv_rsp, clk);
+    addr_word := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_HIBI_ADDR0_integer_c + offset, addr_word'length));
+    addr_byte := addr_word sll 2;
+    wishbone_write(addr_byte, hibi_dest_addr, mst_req, slv_rsp, clk);
 
-    wishbone_write(addr_offset_HIBI_DMA_TRIGGER_slv_c, std_ulogic_vector(unsigned'(x"00000001") sll channel), mst_req, slv_rsp, clk);
+    addr_word := addr_offset_HIBI_DMA_TRIGGER_slv_c;
+    addr_byte := addr_word sll 2;   
+    wishbone_write(addr_byte, std_ulogic_vector(unsigned'(x"00000001") sll channel), mst_req, slv_rsp, clk);
 
   end procedure hibi_local_dma_transfer;
 
@@ -214,13 +222,12 @@ architecture beh of mpsoc_tb is
   -- HIBI bridge wait for link
   -----------------------------------------------------------------------------
   procedure hibi_wait_link(constant channel : in natural; signal mst_req : out wb_req_t; signal slv_rsp : in wb_rsp_t; signal clk : in std_ulogic) is
-    variable addr : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
     variable data : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
     constant mask : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0) := std_ulogic_vector(unsigned'(x"00000001") sll channel);
   begin
 
     busy0: while(true) loop
-      wishbone_read(addr_offset_HIBI_DMA_STATUS_slv_c, data, mst_req, slv_rsp, clk);
+      wishbone_read(addr_offset_HIBI_DMA_STATUS_slv_c sll 2, data, mst_req, slv_rsp, clk);
       exit when unsigned(data and mask) = 0;
     end loop busy0;
 
@@ -291,15 +298,12 @@ architecture beh of mpsoc_tb is
   -----------------------------------------------------------------------------
   procedure hibi_remote_dma_rx_setup(constant hibi_remote_addr : in std_ulogic_vector; constant channel : in natural; constant mem_addr : in std_ulogic_vector; constant count : in positive;
                                      signal mst_req : out wb_req_t; signal slv_rsp : in wb_rsp_t; signal clk : in std_ulogic) is
-    variable offset : integer;
-    variable addr   : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
-    variable data   : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
-    variable cfg    : hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
+    variable offset    : integer;
+    variable addr_word : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable data      : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
+    variable cfg       :  hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
 
   begin
-    offset          := channel * 4;
-    addr            := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr'length));
-
     cfg             := dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c;
     cfg.count       := std_ulogic_vector(to_unsigned(count, dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c.count'length));
     cfg.direction   := '0';
@@ -313,11 +317,16 @@ architecture beh of mpsoc_tb is
     data(bit_offset_HIBI_DMA_CFG0_hibi_cmd_c + cfg.hibi_cmd'length-1 downto bit_offset_HIBI_DMA_CFG0_hibi_cmd_c) := cfg.hibi_cmd;
     data(bit_offset_HIBI_DMA_CFG0_const_addr_c)                                                                  := cfg.const_addr;
 
+    offset          := channel * 4;
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr_word'length));
+   
     wishbone_write(hibi_remote_dma_cfg_buffer_c, data, mst_req, slv_rsp, clk);
-    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr) + 0, hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr_word), hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_MEM_ADDR0_integer_c + offset, addr_word'length));
 
     wishbone_write(hibi_remote_dma_cfg_buffer_c, mem_addr, mst_req, slv_rsp, clk);
-    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr) + 4, hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr_word), hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
     
   end procedure hibi_remote_dma_rx_setup;
 
@@ -328,15 +337,12 @@ architecture beh of mpsoc_tb is
                                      constant hibi_dest_addr : in std_ulogic_vector; constant mem_addr : in std_ulogic_vector; 
                                      constant count : in positive; constant const_addr : in boolean; signal mst_req : out wb_req_t; 
                                      signal slv_rsp : in wb_rsp_t; signal clk : in std_ulogic) is
-    variable offset : integer;
-    variable addr   : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
-    variable data   : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
-    variable cfg    : hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
+    variable offset    : integer;
+    variable addr_word : std_ulogic_vector(hibi_wishbone_bridge_addr_width_c-1 downto 0);
+    variable data      : std_ulogic_vector(hibi_wishbone_bridge_data_width_c-1 downto 0);
+    variable cfg       : hibi_wishbone_bridge_HIBI_DMA_CFG0_rw_t;
 
   begin
-    offset          := channel * 4;
-    addr            := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr'length));
-
     cfg             := dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c;
     cfg.count       := std_ulogic_vector(to_unsigned(count, dflt_hibi_wishbone_bridge_HIBI_DMA_CFG0_c.count'length));
     cfg.direction   := '0';
@@ -354,14 +360,20 @@ architecture beh of mpsoc_tb is
     data(bit_offset_HIBI_DMA_CFG0_hibi_cmd_c + cfg.hibi_cmd'length-1 downto bit_offset_HIBI_DMA_CFG0_hibi_cmd_c) := cfg.hibi_cmd;
     data(bit_offset_HIBI_DMA_CFG0_const_addr_c)                                                                  := cfg.const_addr;
 
+    offset          := channel * 4;
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_CFG0_integer_c + offset, addr_word'length));
     wishbone_write(hibi_remote_dma_cfg_buffer_c, data, mst_req, slv_rsp, clk);
-    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr) + 0, hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr_word), hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
 
+
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_MEM_ADDR0_integer_c + offset, addr_word'length));
     wishbone_write(hibi_remote_dma_cfg_buffer_c, mem_addr, mst_req, slv_rsp, clk);
-    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr) + 4, hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr_word), hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
 
+
+    addr_word       := std_ulogic_vector(to_unsigned(addr_offset_HIBI_DMA_HIBI_ADDR0_integer_c + offset, addr_word'length));
     wishbone_write(hibi_remote_dma_cfg_buffer_c, hibi_dest_addr, mst_req, slv_rsp, clk);
-    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr) + 8, hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
+    hibi_send_prio_b(hibi_remote_addr or std_logic_vector(resize(unsigned(addr_word), hibi_remote_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, mst_req, slv_rsp, clk);
 
   end procedure hibi_remote_dma_tx_setup;
 
@@ -505,13 +517,12 @@ begin
     wait for 2 us;
 
     -- enable logic but not the cores (HIBI transfer enabled IP functionality still disabled -> ready for boot)
-    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c, x"00F0", host_req, host_rsp, clk);
+    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c sll 2, x"00F0", host_req, host_rsp, clk);
     
     wait for 2 us;
 
     target           := CPU0;
     target_hibi_addr := std_ulogic_vector(to_unsigned(hibi_addresses_c(hibi_targets_t'pos(target)), hibi_addr_width_c));
-
 
     hibi_local_dma_enable(host_req, host_rsp, clk);
     hibi_remote_dma_enable(target_hibi_addr, host_req, host_rsp, clk);
@@ -522,6 +533,7 @@ begin
     wishbone_write(hibi_remote_dma_cfg_buffer_c, x"FFFFFFFF", host_req, host_rsp, clk);
     hibi_send_prio_b(target_hibi_addr or std_logic_vector(resize(microsimd.hibi_dma_regfile_pkg.addr_offset_HIBI_DMA_GPIO_unsigned_c,     target_hibi_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, host_req, host_rsp, clk);
     hibi_send_prio_b(target_hibi_addr or std_logic_vector(resize(microsimd.hibi_dma_regfile_pkg.addr_offset_HIBI_DMA_GPIO_DIR_unsigned_c, target_hibi_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, host_req, host_rsp, clk);
+
 
     wait for 2 us;
 
@@ -564,7 +576,7 @@ begin
 
 
     -- enable cores also... ready to rock
-    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c, x"00FF", host_req, host_rsp, clk);
+    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c sll 2, x"00FF", host_req, host_rsp, clk);
 
     wait for 100 us; 
 
