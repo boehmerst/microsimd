@@ -10,6 +10,7 @@ use work.vec_data_pkg.all;
 
 entity core is
   generic (
+    regfile_type_g     : integer range 0 to 2                        := CFG_REGFILE_TYPE;
     use_lsu_g          : boolean                                     := false;
     use_barrel_g       : boolean                                     := CFG_USE_BARREL;
     use_vec_barrel_g   : boolean                                     := CFG_USE_VEC_BARREL;
@@ -116,6 +117,7 @@ begin
   
   decodei0: entity work.decode
     generic map (
+      regfile_type_g  => regfile_type_g,
       use_barrel_g    => use_barrel_g,
       use_hw_mul_g    => use_hw_mul_g,
       use_fsl_g       => use_fsl_g,

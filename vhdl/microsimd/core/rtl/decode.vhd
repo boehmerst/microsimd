@@ -11,14 +11,15 @@ use work.vec_data_pkg.all;
 
 entity decode is
   generic (
-    use_barrel_g : boolean;
-    use_hw_mul_g : boolean;
-    use_fsl_g    : boolean;
-    use_irq_g    : boolean;
-    use_dbg_g    : boolean;
-    use_custom_g : boolean;
-    mci_custom_g : boolean;
-    irq_vec_g    : std_ulogic_vector(CFG_IMEM_SIZE-1 downto 0)
+    regfile_type_g : integer range 0 to 2;
+    use_barrel_g   : boolean;
+    use_hw_mul_g   : boolean;
+    use_fsl_g      : boolean;
+    use_irq_g      : boolean;
+    use_dbg_g      : boolean;
+    use_custom_g   : boolean;
+    mci_custom_g   : boolean;
+    irq_vec_g      : std_ulogic_vector(CFG_IMEM_SIZE-1 downto 0)
   );
   port (
     clk_i        : in  std_ulogic;
@@ -80,16 +81,32 @@ begin
   gprf.adr_w <= decode_i.scu.ctrl_wrb.reg_d;
   gprf.wre   <= decode_i.scu.ctrl_wrb.reg_write;
 
-  gprf0 : entity work.gprf
-    generic map (
-      dmem_width_g     => CFG_DMEM_WIDTH,
-      gprf_size_g      => CFG_GPRF_SIZE
-    )
-    port map (
-      clk_i  => clk_i,
-      gprf_o => gprf_o,
-      gprf_i => gprf
-    );
+  regfile_bram: if regfile_type_g = regfile_type_t'pos(bram) generate
+    gprf0 : entity work.gprf
+      generic map (
+        dmem_width_g => CFG_DMEM_WIDTH,
+        gprf_size_g  => CFG_GPRF_SIZE
+      )
+      port map (
+        clk_i  => clk_i,
+        gprf_o => gprf_o,
+        gprf_i => gprf
+      );
+  end generate regfile_bram;
+
+  regfile_reg: if regfile_type_g = regfile_type_t'pos(reg) generate
+    gprf0: entity work.gprf_register
+      generic map (
+        dmem_width_g => CFG_DMEM_WIDTH,
+        gprf_size_g  => CFG_GPRF_SIZE
+      )
+      port map (
+        clk_i     => clk_i,
+	reset_n_i => reset_n_i,
+        gprf_o    => gprf_o,
+        gprf_i    => gprf
+      );
+  end generate regfile_reg;
     
   ------------------------------------------------------------------------------
   -- SIMD unit Register File
@@ -102,17 +119,35 @@ begin
   vecrf.adr_w <= decode_i.simd.ctrl_wrb.reg_d;
   vecrf.wre   <= decode_i.simd.ctrl_wrb.reg_write;  
 
-  vecrf0: entity work.vecrf
-    generic map(
-      dmem_width_g    => CFG_DMEM_WIDTH,
-      vreg_slc_g      => CFG_VREG_SLICES,
-      vreg_size_g     => CFG_VREG_SIZE
-    )
-    port map (
-      clk_i   => clk_i,
-      vecrf_o => vecrf_o,
-      vecrf_i => vecrf
-    );    
+  vregfile_bram: if regfile_type_g = regfile_type_t'pos(bram) generate
+    vecrf0: entity work.vecrf
+      generic map(
+        dmem_width_g => CFG_DMEM_WIDTH,
+        vreg_slc_g   => CFG_VREG_SLICES,
+        vreg_size_g  => CFG_VREG_SIZE
+      )
+      port map (
+        clk_i   => clk_i,
+        vecrf_o => vecrf_o,
+        vecrf_i => vecrf
+      );
+    end generate vregfile_bram;
+
+    vregfile_reg: if regfile_type_g = regfile_type_t'pos(reg) generate
+    vecrf0: entity work.vecrf_register
+      generic map(
+        dmem_width_g    => CFG_DMEM_WIDTH,
+        vreg_slc_g      => CFG_VREG_SLICES,
+        vreg_size_g     => CFG_VREG_SIZE
+      )
+      port map (
+        clk_i     => clk_i,
+	reset_n_i => reset_n_i,
+        vecrf_o   => vecrf_o,
+        vecrf_i   => vecrf
+      );
+    end generate vregfile_reg;    
+
     
   ------------------------------------------------------------------------------
   -- comb0
