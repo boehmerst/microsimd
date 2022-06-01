@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 
 package config_pkg is
 
+  type regfile_type_t is (reg, latch, bram);
+  constant CFG_REGFILE_TYPE   : integer := regfile_type_t'pos(reg);
+
   -- Implement hardware multiplier
   constant CFG_USE_HW_MUL     : boolean  := true;    -- Disable or enable multiplier [0,1]
   constant CFG_USE_HW_VEC_MUL : boolean  := true;    -- Disable or enable vector multiplier [0,1]
