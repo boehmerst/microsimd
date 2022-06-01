@@ -3,7 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.config_pkg.all;
 use work.core_pkg.all;
 
 entity vecrf is
