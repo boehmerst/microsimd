@@ -245,12 +245,12 @@ package core_pkg is
   end record gprf_out_t;
   
   type vecrf_in_t is record
-    adr_a             : std_ulogic_vector(CFG_VREG_SIZE-1  downto 0);
-    adr_b             : std_ulogic_vector(CFG_VREG_SIZE-1  downto 0);
-    adr_d             : std_ulogic_vector(CFG_VREG_SIZE-1  downto 0);
+    adr_a             : std_ulogic_vector(CFG_VREG_SIZE-1   downto 0);
+    adr_b             : std_ulogic_vector(CFG_VREG_SIZE-1   downto 0);
+    adr_d             : std_ulogic_vector(CFG_VREG_SIZE-1   downto 0);
     dat_w             : vec_data_t;
-    adr_w             : std_ulogic_vector(CFG_VREG_SIZE-1  downto 0);
-    wre               : std_ulogic_vector(1 downto 0);
+    adr_w             : std_ulogic_vector(CFG_VREG_SIZE-1   downto 0);
+    wre               : std_ulogic_vector(CFG_VREG_SLICES-1 downto 0);
     ena               : std_ulogic;
   end record vecrf_in_t;
 
