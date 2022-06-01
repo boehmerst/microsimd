@@ -58,6 +58,7 @@ architecture rtl of hibi_wishbone_bridge_wrapper is
 
   signal bridgei0_mem_req  : hibi_wishbone_bridge_mem_req_t;
   signal host_mem_req      : hibi_wishbone_bridge_mem_req_t;
+  signal bridge_mem_req    : hibi_wishbone_bridge_mem_req_t;
 
   signal memi0_port_a_rsp  : hibi_wishbone_bridge_mem_rsp_t;
   signal memi0_port_b_rsp  : hibi_wishbone_bridge_mem_rsp_t;
@@ -141,6 +142,11 @@ begin
     host_mem_req.dat    <= std_ulogic_vector(resize(unsigned(host_gif_req(gif_bus_t'pos(mem)).wdata), host_mem_req.dat'length));
     memi0_gif_rsp.rdata <= std_ulogic_vector(resize(unsigned(memi0_port_a_rsp.dat), memi0_gif_rsp.rdata'length));
 
+    bridge_mem_req.adr  <= "00" & bridgei0_mem_req.adr(bridgei0_mem_req.adr'left downto 2);
+    bridge_mem_req.we   <= bridgei0_mem_req.we;
+    bridge_mem_req.ena  <= bridgei0_mem_req.ena;
+    bridge_mem_req.dat  <= bridgei0_mem_req.dat;
+
     reg0: entity tech.reg port map (clk_i, reset_n_i, en_i, init_i, host_mem_req.ena, memi0_gif_rsp.ack);
 
     memi0: entity work.dual_port_buffer
@@ -155,7 +161,7 @@ begin
 	init_i       => init_i,
 	port_a_req_i => host_mem_req,
 	port_a_rsp_o => memi0_port_a_rsp,
-	port_b_req_i => bridgei0_mem_req,
+	port_b_req_i => bridge_mem_req,
 	port_b_rsp_o => memi0_port_b_rsp
       );
 
