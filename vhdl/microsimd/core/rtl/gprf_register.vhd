@@ -69,7 +69,7 @@ begin
   -----------------------------------------------------------------------------
   sync0: process (clk_i, reset_n_i) is
   begin
-    if reset_n_i = '1' then
+    if reset_n_i = '0' then
       r <= dflt_reg_c;
     elsif rising_edge(clk_i) then
       if gprf_i.ena = '1' then
