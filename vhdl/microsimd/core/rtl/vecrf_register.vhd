@@ -48,7 +48,7 @@ begin
       -----------------------------------------------------------------------------
       -- comb0
       -----------------------------------------------------------------------------
-      comb0: process (r, vecrf_i.wre(i)) is
+      comb0: process (r, vecrf_i.wre(i), vecrf_i.dat_w(i), vecrf_i.adr_a, vecrf_i.adr_b, vecrf_i.adr_d, vecrf_i.adr_w) is
         variable v : reg_t;
       begin
         v := r;
@@ -73,7 +73,7 @@ begin
       -----------------------------------------------------------------------------
       sync0: process (clk_i, reset_n_i) is
       begin
-        if reset_n_i = '1' then
+        if reset_n_i = '0' then
           r <= dflt_reg_c;
         elsif rising_edge(clk_i) then
           if vecrf_i.ena = '1' then
