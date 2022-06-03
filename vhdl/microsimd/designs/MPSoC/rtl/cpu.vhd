@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library tech;
+
 library microsimd;
 use microsimd.config_pkg.all;
 use microsimd.core_pkg.all;
@@ -41,6 +43,7 @@ architecture rtl of cpu is
   constant nr_mst_c              : integer   := 3;
   
   type xbar_mst_t is (imst, dmst, dma);
+  type xbar_slv_t is (mem0, mem1, mem2);
   
   signal imem                    : imem_in_t;
   signal dmem                    : dmem_in_t;
@@ -149,6 +152,9 @@ begin
   xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.en   <= hibi_dmai0_mem_req.ena;
   xbar_mst_req(xbar_mst_t'pos(dma)).wdata     <= hibi_dmai0_mem_req.dat; 
 
+  -----------------------------------------------------------------------------
+  -- simple xvar for slaves that respond the next cycle e.g. SRAM
+  -----------------------------------------------------------------------------
   xbari0: entity microsimd.xbar
     generic map (
       log2_wsize_g   => ram_size_c,
@@ -175,24 +181,24 @@ begin
     signal mem_we  : std_ulogic_vector(3 downto 0);
     signal mem_en  : std_ulogic;
   begin   
-    mem_we <= xbari0_slv_req(0).ctrl.sel when xbari0_slv_req(0).ctrl.wr = '1' else "0000";
+    mem_we <= xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.sel when xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.wr = '1' else "0000";
     mem_en <= xbari0_slv_req(0).ctrl.en;    
 
-    memi0 : entity microsimd.sram_4en
+    memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => CFG_DMEM_WIDTH,
         addr_width_g  => ram_size_c-2
       )
       port map (
         clk_i  => clk_i,
-        wre_i  => mem_we,
-        ena_i  => mem_en,
-        addr_i => xbari0_slv_req(0).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i  => xbari0_slv_req(0).wdata,
-        dat_o  => mem_dat
+        we_i   => mem_we,
+        en_i   => mem_en,
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.addr(ram_size_c-1 downto 2),
+        di_i   => xbari0_slv_req(xbar_slv_t'pos(mem0)).wdata,
+        do_o   => mem_dat
       );
     
-     xbar_slv_rsp(0).rdata <= mem_dat;
+     xbar_slv_rsp(xbar_slv_t'pos(mem0)).rdata <= mem_dat;
   end block mem_block0;
    
   ------------------------------------------------------------------------------
@@ -203,24 +209,24 @@ begin
     signal mem_we  : std_ulogic_vector(3 downto 0);
     signal mem_en  : std_ulogic;
   begin   
-    mem_we <= xbari0_slv_req(1).ctrl.sel when xbari0_slv_req(1).ctrl.wr = '1' else "0000";
-    mem_en <= xbari0_slv_req(1).ctrl.en;    
+    mem_we <= xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.sel when xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.wr = '1' else "0000";
+    mem_en <= xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.en;    
 
-    memi0 : entity microsimd.sram_4en
+    memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => CFG_DMEM_WIDTH,
         addr_width_g => ram_size_c-2
       )
       port map (
         clk_i  => clk_i,
-        wre_i  => mem_we,
-        ena_i  => mem_en,
-        addr_i => xbari0_slv_req(1).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i  => xbari0_slv_req(1).wdata,
-        dat_o  => mem_dat
+        we_i   => mem_we,
+        en_i   => mem_en,
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.addr(ram_size_c-1 downto 2),
+        di_i   => xbari0_slv_req(xbar_slv_t'pos(mem1)).wdata,
+        do_o   => mem_dat
       );
     
-     xbar_slv_rsp(1).rdata <= mem_dat;
+     xbar_slv_rsp(xbar_slv_t'pos(mem1)).rdata <= mem_dat;
   end block mem_block1;
   
   ------------------------------------------------------------------------------
@@ -231,24 +237,24 @@ begin
     signal mem_we  : std_ulogic_vector(3 downto 0);
     signal mem_en  : std_ulogic;
   begin   
-    mem_we <= xbari0_slv_req(2).ctrl.sel when xbari0_slv_req(2).ctrl.wr = '1' else "0000";
-    mem_en <= xbari0_slv_req(2).ctrl.en;    
+    mem_we <= xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.sel when xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.wr = '1' else "0000";
+    mem_en <= xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.en;    
 
-    memi0 : entity microsimd.sram_4en
+    memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => CFG_DMEM_WIDTH,
         addr_width_g => ram_size_c-2
       )
       port map (
         clk_i  => clk_i,
-        wre_i  => mem_we,
-        ena_i  => mem_en,
-        addr_i => xbari0_slv_req(2).ctrl.addr(ram_size_c-1 downto 2),
-        dat_i  => xbari0_slv_req(2).wdata,
-        dat_o  => mem_dat
+        we_i   => mem_we,
+        en_i   => mem_en,
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.addr(ram_size_c-1 downto 2),
+        di_i   => xbari0_slv_req(xbar_slv_t'pos(mem2)).wdata,
+        do_o   => mem_dat
       );
     
-     xbar_slv_rsp(2).rdata <= mem_dat;
+     xbar_slv_rsp(xbar_slv_t'pos(mem2)).rdata <= mem_dat;
   end block mem_block2;
 
 end architecture rtl;
