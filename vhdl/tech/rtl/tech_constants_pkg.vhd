@@ -11,11 +11,12 @@ constant tech_altera_c   : integer := 2;
 constant tech_lattice_c  : integer := 3;
 constant tech_asic_c     : integer := 4;
 constant tech_infineon_c : integer := 5;
+constant tech_sky130_c   : integer := 6;
 
 -------------------------------------------------------------------------------
 -- modify according to targeted technology
 -------------------------------------------------------------------------------
-constant target_tech_c  : integer := tech_behave_c;
+constant target_tech_c  : integer := tech_sky130_c;
 
 end package tech_constants_pkg;
 
