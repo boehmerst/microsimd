@@ -40,6 +40,9 @@ architecture beh of sky130_sram_2kbyte_1rw1r_32x512_8 is
   signal addr0_reg  : std_ulogic_vector(addr0'length-1  downto 0);
   signal din0_reg   : std_ulogic_vector(din0'length-1   downto 0);
 
+  signal dout0_int  : std_logic_vector(din0'length-1 downto 0);
+  signal dout1_int  : std_logic_vector(din0'length-1 downto 0);
+
   signal csb1_reg   : std_ulogic;
   signal addr1_reg  : std_ulogic_vector(addr1'length-1  downto 0);
 
@@ -84,8 +87,10 @@ architecture beh of sky130_sram_2kbyte_1rw1r_32x512_8 is
     assert false report "Memory filling successfull" severity note;
   end procedure mem_init;
 
+  constant random_pattern_c : std_ulogic_vector(din0'length-1 downto 0) := std_ulogic_vector(resize(unsigned'(X"DEADBEAFAFFEDEAD"), din0'length));
 
-  signal mem : ram_t;
+  -- TODO: this is to stop annoying conversion warnings but might hide bugs
+  signal mem : ram_t := (others => random_pattern_c);
 
 begin
   -----------------------------------------------------------------------------
@@ -99,7 +104,6 @@ begin
       wmask0_reg <= wmask0;
       addr0_reg  <= addr0;
       din0_reg   <= din0;
-      dout0      <= (others =>'X') after T_HOLD;
     end if;
   end process reg0;
 
@@ -152,8 +156,10 @@ begin
   begin
     if falling_edge(clk0) then
       if(csb0_reg = '0' and web0_reg = '1') then
-        dout0 <= mem(to_integer(unsigned(addr0_reg))) after T_DELAY;
+        dout0_int <= mem(to_integer(unsigned(addr0_reg))) after T_DELAY;
       end if;
+    elsif rising_edge(clk0) then
+      dout0_int <= random_pattern_c after T_HOLD;
     end if;
   end process read0;
 
@@ -164,10 +170,15 @@ begin
   begin
     if falling_edge(clk1) then
       if(csb1_reg = '0') then
-        dout1 <= mem(to_integer(unsigned(addr1_reg))) after T_DELAY;
+        dout1_int <= mem(to_integer(unsigned(addr1_reg))) after T_DELAY;
       end if;
+    elsif rising_edge(clk1) then
+      dout1_int <= random_pattern_c after T_HOLD;
     end if;
   end process read1;
+
+  dout0 <= std_ulogic_vector(dout0_int);
+  dout1 <= std_ulogic_vector(dout1_int);
 
 end architecture beh;
 
