@@ -76,10 +76,10 @@ begin
     -- NOTE: Everything is 32 Bit aligned internally and no byte or half word 
     -- access are supported
     ---------------------------------------------------------------------------
-    gif_req_o(0).addr  <= std_ulogic_vector(resize(unsigned(wb_req_i.adr(wb_req_i.adr'left-1 downto 2)), gif_req_o(0).addr'length));
+    gif_req_o(0).addr  <= std_ulogic_vector(resize(unsigned(wb_req_i.adr(wb_req_i.adr'left-1 downto 0)), gif_req_o(0).addr'length));
     gif_req_o(0).wdata <= std_ulogic_vector(resize(unsigned(wb_req_i.dat), gif_req_o(0).wdata'length));
 
-    gif_req_o(1).addr  <= std_ulogic_vector(resize(unsigned(wb_req_i.adr(wb_req_i.adr'left-1 downto 2)), gif_req_o(1).addr'length));
+    gif_req_o(1).addr  <= std_ulogic_vector(resize(unsigned(wb_req_i.adr(wb_req_i.adr'left-1 downto 0)), gif_req_o(1).addr'length));
     gif_req_o(1).wdata <= std_ulogic_vector(resize(unsigned(wb_req_i.dat), gif_req_o(1).wdata'length));
 
     gif_req_o(0).wr    <= mem_en and     wb_req_i.we and not sel;
