@@ -155,8 +155,10 @@ begin
     ----------------------------------------------------------------------------
     -- address decoder
     ----------------------------------------------------------------------------
+    slv_sel := (others => (others => '0'));
+
     slv_sel0: for i in 0 to nr_mst_g-1 loop
-      slv_sel(i)      := (others=>'0');
+      --slv_sel(i)      := (others=>'0');
       if(xbar_mst_req_mux(i).ctrl.en = '1') then
         slv_sel(i)    := addr_decode(xbar_mst_req_mux(i).ctrl.addr);
       end if;
