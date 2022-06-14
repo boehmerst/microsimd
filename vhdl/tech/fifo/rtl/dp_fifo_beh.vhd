@@ -127,7 +127,7 @@ begin
   --'full_o' logic for the writing port:
   preset_full <= status and equal_addresses; --'Full' Fifo.
    
-  process (wclk_i, preset_full) begin--D Flip-Flop w/ Asynchronous Preset.
+  process (wclk_i, preset_full) begin --D Flip-Flop w/ Asynchronous Preset.
     if (preset_full = '1') then
       full <= '1';
     elsif (rising_edge(wclk_i)) then
@@ -139,7 +139,7 @@ begin
   --'empty_o' logic for the reading port:
   preset_empty <= not status and equal_addresses; --'Empty' Fifo.
    
-  process (rclk_i, preset_empty) begin--D Flip-Flop w/ Asynchronous Preset.
+  process (rclk_i, preset_empty) begin --D Flip-Flop w/ Asynchronous Preset.
     if (preset_empty = '1') then
       empty <= '1';
     elsif (rising_edge(rclk_i)) then
