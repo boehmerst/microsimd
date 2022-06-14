@@ -113,6 +113,8 @@ begin
     ----------------------------------------------------------------------------
     -- check overflow
     ----------------------------------------------------------------------------
+    ovflw := dflt_mul32_flags_c;
+
     if(mul_i.sign = S) then
       -- actually doing unsigned multiply internally, and then negate on output as appropriate, 
       -- so if sign bit is set, then is overflow unless incoming signs differ and result is 2^(width-1)
@@ -141,12 +143,12 @@ begin
       -- actually doing unsigned multiply internally, and then negate on output as appropriate, 
       -- so if sign bit is set, then is overflow unless incoming signs differ and result is 2^(width-1)
       if( v_or(muli0_product(63 downto 8)) = '1' ) then
-        ovflw.double := '1';
+        ovflw.byte := '1';
       elsif( muli0_product(7) = '1' and not (r.sign(r.sign'left) = '1' and v_or(muli0_product(6 downto 0)) = '0') ) then
-        ovflw.double := '1';
+        ovflw.byte := '1';
       end if; 
     else
-      ovflw.double   := v_or(muli0_product(63 downto 8));
+      ovflw.byte   := v_or(muli0_product(63 downto 8));
     end if;
     
     ----------------------------------------------------------------------------
