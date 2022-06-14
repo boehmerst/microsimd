@@ -127,8 +127,8 @@ begin
 
     if(readcontents = true and file_name_g /= "none") then
       mem_init(mem);
-      readcontents := false;
     end if;
+    readcontents := false;
 
     if rising_edge(clk0) then
       if(csb0_reg = '0' and web0_reg = '0') then
