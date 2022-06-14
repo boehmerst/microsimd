@@ -29,9 +29,8 @@ begin
         -- first 'ena_i'.
       elsif (ena_i = '1') then
         count   <= count + 1;
-        count_o <= ( count(counter_width_g-1) & 
-                     std_logic_vector(count(counter_width_g-2 downto 0)) xor 
-                     std_logic_vector(count(counter_width_g-1 downto 1)) );
+        count_o <= ( count(counter_width_g-1) & (std_logic_vector(count(counter_width_g-2 downto 0)) xor 
+		                                 std_logic_vector(count(counter_width_g-1 downto 1))) );
       end if;
     end if;
   end process;
