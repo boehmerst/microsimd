@@ -32,6 +32,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
+library tech;
+
 entity multiclk_fifo is
   
   generic (
@@ -108,22 +110,44 @@ begin  -- rtl
   empty_out    <= empty_out_r; --empty_from_fifo;
   one_d_out    <= one_d_from_fifo;
 
-    regular_fifo: fifo
-      generic map (
-        data_width_g => data_width_g,
-        depth_g      => depth_g)
-      port map (
-        clk       => clk_fifo,            -- this is the difference
-        rst_n     => rst_n,
-        data_in   => data_to_fifo,
-        we_in     => we_to_fifo,
-        full_out  => full_from_fifo,
-        one_p_out => one_p_from_fifo,
-        re_in     => re_to_fifo,
-        data_out  => data_from_fifo,
-        empty_out => empty_from_fifo,
-        one_d_out => one_d_from_fifo
-        );
+    --regular_fifo: fifo
+    --  generic map (
+    --    data_width_g => data_width_g,
+    --    depth_g      => depth_g)
+    --  port map (
+    --    clk       => clk_fifo,            -- this is the difference
+    --    rst_n     => rst_n,
+    --    data_in   => data_to_fifo,
+    --    we_in     => we_to_fifo,
+    --    full_out  => full_from_fifo,
+    --    one_p_out => one_p_from_fifo,
+    --    re_in     => re_to_fifo,
+    --    data_out  => data_from_fifo,
+    --    empty_out => empty_from_fifo,
+    --    one_d_out => one_d_from_fifo
+    --    );
+
+  -- TODO: Use technolpogy wrapper
+  regular_fifo: entity tech.basic_fifo_flags_beh
+  generic map (
+    width_g        => data_width_g,
+    depth_g        => depth_g,
+    af_level_g     => depth_g-2,
+    ae_level_g     => 2
+  )
+  port map (
+    reset_n_i      => rst_n,
+    clk_i          => clk_fifo,
+    wr_en_i        => we_to_fifo,
+    wr_data_i      => data_to_fifo,
+    almost_full_o  => one_p_from_fifo,
+    full_o         => full_from_fifo, 
+    rd_en_i        => re_to_fifo,
+    rd_data_o      => data_from_fifo,
+    almost_empty_o => one_d_from_fifo,
+    empty_o        => empty_from_fifo
+  );
+        
 
   process (clk_slow, rst_n)
   begin  -- process
