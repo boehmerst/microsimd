@@ -299,8 +299,8 @@ begin  -- structural
 
 
   -- Design compiler
-  cm : cfg_mem
-    --cm : entity work.cfg_mem
+  --cm : cfg_mem
+  cm : entity work.cfg_mem_static
     generic map(
       counter_width_g => counter_width_g,
       id_g            => id_g,
