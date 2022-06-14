@@ -199,7 +199,7 @@ begin
       keep_slot_g         => 0,
       n_extra_params_g    => 1,
       cfg_re_g            => 0,
-      cfg_we_g            => 1,
+      cfg_we_g            => 0,
       debug_width_g       => 0,
       n_agents_g          => nr_agents_c,
       separate_addr_g     => 0
