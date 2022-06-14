@@ -7,6 +7,7 @@ library tech;
 library microsimd;
 use microsimd.config_pkg.all;
 use microsimd.core_pkg.all;
+use microsimd.func_pkg.all;
 use microsimd.vec_data_pkg.all;
 use microsimd.hibi_link_pkg.all;
 use microsimd.hibi_dma_pkg.all;
@@ -34,16 +35,16 @@ entity cpu is
 end entity cpu;
 
 architecture rtl of cpu is
-  
-  -- TODO: derive from CFG_DMEM_SIZE / CFG_IMEM_SIZE
-  constant rom_size_c            : integer   := 10;
-  constant ram_size_c            : integer   := 10;
-  
+    
   constant nr_slv_c              : integer   := 3;
   constant nr_mst_c              : integer   := 3;
   
   type xbar_mst_t is (imst, dmst, dma);
   type xbar_slv_t is (mem0, mem1, mem2);
+
+  constant nr_mem_blocks_c       : integer   := xbar_slv_t'pos(xbar_slv_t'right)+1;
+  constant mem_block_size_c      : integer   := log2ceil(512);
+  constant ram_size_c            : integer   := mem_block_size_c+2;
   
   signal imem                    : imem_in_t;
   signal dmem                    : dmem_in_t;
@@ -186,8 +187,8 @@ begin
 
     memi0 : entity tech.sp_sync_mem
       generic map (
-        data_width_g => CFG_DMEM_WIDTH,
-        addr_width_g  => ram_size_c-2
+        data_width_g  => CFG_DMEM_WIDTH,
+        addr_width_g  => mem_block_size_c
       )
       port map (
         clk_i  => clk_i,
@@ -215,7 +216,7 @@ begin
     memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => CFG_DMEM_WIDTH,
-        addr_width_g => ram_size_c-2
+        addr_width_g => mem_block_size_c
       )
       port map (
         clk_i  => clk_i,
@@ -243,7 +244,7 @@ begin
     memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => CFG_DMEM_WIDTH,
-        addr_width_g => ram_size_c-2
+        addr_width_g => mem_block_size_c
       )
       port map (
         clk_i  => clk_i,
