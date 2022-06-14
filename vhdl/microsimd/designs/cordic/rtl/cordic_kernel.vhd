@@ -114,11 +114,21 @@ begin
             end if;
           end if;
         end process sync0;
+
+      x_o <= x_reg;
+      y_o <= y_reg;
+      z_o <= z_reg;
     end generate gen_reg;
 
-    x_o <= x_reg when registered_g = '1' else std_ulogic_vector(dx);
-    y_o <= y_reg when registered_g = '1' else std_ulogic_vector(dy);
-    z_o <= z_reg when registered_g = '1' else std_ulogic_vector(dz);
+    gen_out: if registered_g = '0' generate
+      x_o <= std_ulogic_vector(dx);
+      y_o <= std_ulogic_vector(dy);
+      z_o <= std_ulogic_vector(dz);
+    end generate;
+
+    --x_o <= x_reg when registered_g = '1' else std_ulogic_vector(dx);
+    --y_o <= y_reg when registered_g = '1' else std_ulogic_vector(dy);
+    --z_o <= z_reg when registered_g = '1' else std_ulogic_vector(dz);
 
   end block reg_block;
 
