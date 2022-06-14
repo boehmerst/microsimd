@@ -543,6 +543,11 @@ package core_pkg is
     word   : std_ulogic;
     double : std_ulogic;
   end record mul32_flags_t;
+  constant dflt_mul32_flags_c : mul32_flags_t :=(
+    byte   => '0',
+    word   => '0',
+    double => '0'
+  );
   
   type mul32_out_t is record
     valid  : std_ulogic;
