@@ -62,7 +62,8 @@ architecture rtl of custom_inst0 is
   function shift_left(v : in std_ulogic_vector; shift : in natural) return std_ulogic_vector is
     variable shifted : std_ulogic_vector(v'length-1 downto 0);
   begin
-    shifted := v(v'left-shift downto 0) & (shift-1 downto 0 => '0');
+    --shifted := v(v'left-shift downto 0) & (shift-1 downto 0 => '0');
+    shifted := v sll shift;
     return shifted;
   end function shift_left;
 
@@ -70,15 +71,28 @@ architecture rtl of custom_inst0 is
   -- arithmetic barrel shift right
   -----------------------------------------------------------------------------
   function arith_shift_right(v : in std_ulogic_vector; shift : in natural) return std_ulogic_vector is
-    variable result : std_ulogic_vector(v'length-1 downto 0);
+    variable shifted     : std_ulogic_vector(v'length+1-1 downto 0);
+    variable result      : std_ulogic_vector(v'length-1  downto 0);
+    variable shifted_out : std_ulogic;
   begin
-    result := (v'left downto v'left-shift => v(v'left)) & v(v'left-1 downto shift);
+    --result := (v'left downto v'left-shift => v(v'left)) & v(v'left-1 downto shift);
 
-    if(shift /= 0 and shift /= v'length-1) then -- round arg < -0.5 -> 0 
-      if(v = (v'left-1 downto shift => '1') and v(shift-1) = '1') then
+    --if(shift /= 0 and shift /= v'length-1) then -- round arg < -0.5 -> 0 
+    --  if(v = (v'left-1 downto shift => '1') and v(shift-1) = '1') then
+    --    result := (others=>'0');
+    --  end if;
+    --end if;
+
+    shifted     := std_ulogic_vector(resize(signed(v), v'length+1) sra shift);
+    shifted_out := shifted(0);
+    result      := shifted(shifted'left downto 1);
+
+    if(shift /= 0 and shift /= v'length-1) then
+      if shifted_out = '1' then
         result := (others=>'0');
       end if;
     end if;
+
     return result;
   end function arith_shift_right;
 
