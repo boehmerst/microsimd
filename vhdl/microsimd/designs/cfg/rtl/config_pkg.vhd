@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 package config_pkg is
 
   type regfile_type_t is (reg, latch, bram);
-  constant CFG_REGFILE_TYPE   : integer := regfile_type_t'pos(reg);
+  constant CFG_REGFILE_TYPE   : integer  := regfile_type_t'pos(reg);
 
   -- Implement hardware multiplier
   constant CFG_USE_HW_MUL     : boolean  := true;    -- Disable or enable multiplier [0,1]
@@ -55,7 +55,7 @@ package config_pkg is
   constant CFG_NR_FSL         : positive range 1 to 3 := fsl_slave_t'pos(fsl_slave_t'right)+1;
   
   -- Custom instruction
-  constant CFG_USE_CUSTOM     : boolean  := true;    -- Use custom vector instruction
+  constant CFG_USE_CUSTOM     : boolean  := false;    -- Use custom vector instruction
   constant CFG_MCI_CUSTOM     : boolean  := true;    -- Custom is multicycle instruction
 
 end package config_pkg;
