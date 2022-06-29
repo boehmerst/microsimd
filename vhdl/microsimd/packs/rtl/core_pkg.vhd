@@ -583,16 +583,17 @@ package core_pkg is
   function align_vec_store(data : vec_data_t; size : std_ulogic_vector(1 downto 0)) return vec_data_t;
   function decode_vreg_wb(wide : std_ulogic; reg : std_ulogic) return std_ulogic_vector;
   function expand_imm(cmode : std_ulogic_vector(3 downto 0); op : std_ulogic; imm8 : std_ulogic_vector(7 downto 0)) return std_ulogic_vector;
+  function align_adr(adr : std_logic_vector(CFG_IMEM_SIZE-1 downto 0); target_width : positive; granularity : transfer_size_t) return std_ulogic_vector;
 
 end package core_pkg;
 
 package body core_pkg is
---------------------------------------------------------------------------------
--- This function select the register value:
---   A) zero
---   B) bypass value read from register file
---   C) value from register file
---------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  -- This function select the register value:
+  --   A) zero
+  --   B) bypass value read from register file
+  --   C) value from register file
+  ------------------------------------------------------------------------------
   function select_register_data (reg_dat, reg, wb_dat : std_ulogic_vector; write : std_ulogic) return std_ulogic_vector is
     variable tmp : std_ulogic_vector(CFG_DMEM_WIDTH-1 downto 0);
   begin
@@ -606,9 +607,9 @@ package body core_pkg is
       return tmp;
   end function select_register_data;
   
-  -----------------------------------------------------------------------------
+  ---------------------------------------------------------------------------
   -- Same as select_register_data but for vector registers
-  -----------------------------------------------------------------------------
+  ---------------------------------------------------------------------------
   function sel_vecreg_data(reg_dat: vec_data_t; reg : std_ulogic_vector; wb_dat : vec_data_t; write : std_ulogic) return vec_data_t is
     variable tmp : vec_data_t;
   begin
@@ -622,18 +623,19 @@ package body core_pkg is
       return tmp;
   end function sel_vecreg_data;  
   
---------------------------------------------------------------------------------
--- This function checks if a forwarding condition is met. The condition is met 
--- of register A and D match
--- and the signal needs to be written back to the register file
---------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  -- This function checks if a forwarding condition is met. The condition is met 
+  -- of register A and D match
+  -- and the signal needs to be written back to the register file
+  ------------------------------------------------------------------------------
   function fwd_cond (reg_write : std_ulogic; reg_a, reg_d : std_ulogic_vector ) return std_ulogic is
   begin
     return reg_write and compare(reg_a, reg_d);
   end function fwd_cond;
---------------------------------------------------------------------------------
--- This function aligns the memory load operation (Big endian decoding)
---------------------------------------------------------------------------------
+
+  ------------------------------------------------------------------------------
+  -- This function aligns the memory load operation (Big endian decoding)
+  ------------------------------------------------------------------------------
   function align_mem_load (data : std_ulogic_vector; size : transfer_size_t; address : std_ulogic_vector ) return std_ulogic_vector is
   begin
     case size is
@@ -655,9 +657,10 @@ package body core_pkg is
         return data;
     end case;
   end function align_mem_load;
---------------------------------------------------------------------------------
--- This function repeats the operand to all positions in a memory store operation
---------------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------------
+  -- This function repeats the operand to all positions in a memory store operation
+  ---------------------------------------------------------------------------------
   function align_mem_store (data : std_ulogic_vector; size : transfer_size_t) return std_ulogic_vector is
   begin
     case size is
@@ -666,9 +669,10 @@ package body core_pkg is
       when others   => return data;
     end case;
   end function align_mem_store;
---------------------------------------------------------------------------------
--- This function selects the correct bytes for memory writes (Big endian encoding)
---------------------------------------------------------------------------------
+
+  ----------------------------------------------------------------------------------
+  -- This function selects the correct bytes for memory writes (Big endian encoding)
+  ----------------------------------------------------------------------------------
   function decode_mem_store (address : std_ulogic_vector(1 downto 0); size : transfer_size_t) return std_ulogic_vector is
   begin
     case size is
@@ -691,9 +695,10 @@ package body core_pkg is
         return "1111";
     end case;
   end function decode_mem_store;
---------------------------------------------------------------------------------
--- This function aligns the memory vector load operation (WIDE vs. NARROW)
---------------------------------------------------------------------------------
+
+  ------------------------------------------------------------------------------
+  -- This function aligns the memory vector load operation (WIDE vs. NARROW)
+  ------------------------------------------------------------------------------
   function align_vec_load(data : vec_data_t; size : std_ulogic_vector(1 downto 0)) return vec_data_t is
     variable result : vec_data_t;
   begin
@@ -706,9 +711,10 @@ package body core_pkg is
     end if;
     return result;
   end function align_vec_load;
---------------------------------------------------------------------------------
--- This function repeats the operand in a vector store operation
---------------------------------------------------------------------------------
+
+  ------------------------------------------------------------------------------
+  -- This function repeats the operand in a vector store operation
+  ------------------------------------------------------------------------------
   function align_vec_store(data : vec_data_t; size : std_ulogic_vector(1 downto 0)) return vec_data_t is
     variable result : vec_data_t;
   begin
@@ -721,9 +727,10 @@ package body core_pkg is
     end if;
     return result;
   end function align_vec_store;
---------------------------------------------------------------------------------
--- This function decodes reg writeback flag
---------------------------------------------------------------------------------
+
+  ------------------------------------------------------------------------------
+  -- This function decodes reg writeback flag
+  ------------------------------------------------------------------------------
   function decode_vreg_wb(wide : std_ulogic; reg : std_ulogic) return std_ulogic_vector is
     variable result : std_ulogic_vector(1 downto 0);
   begin
@@ -731,9 +738,10 @@ package body core_pkg is
     result(1) := wide or reg;
     return result;
   end function decode_vreg_wb;
---------------------------------------------------------------------------------
--- expand simmediate
---------------------------------------------------------------------------------
+
+  ------------------------------------------------------------------------------
+  -- expand simmediate
+  ------------------------------------------------------------------------------
   function expand_imm(cmode : std_ulogic_vector(3 downto 0); op : std_ulogic; imm8 : std_ulogic_vector(7 downto 0)) return std_ulogic_vector is
     variable result : std_ulogic_vector(CFG_DMEM_WIDTH-1 downto 0);
   begin
@@ -766,6 +774,22 @@ package body core_pkg is
     end case;
     return result;
   end function expand_imm;
-  
+
+  -----------------------------------------------------------------------------
+  -- align address to adapt to word or halfword granular interface
+  -----------------------------------------------------------------------------
+  function align_adr(adr : std_ulogic_vector(CFG_IMEM_SIZE-1 downto 0); target_width : positive; granularity : transfer_size_t) return std_ulogic_vector is
+    variable result : std_ulogic_vector(CFG_IMEM_SIZE-1 downto 0);
+  begin
+    result := (others=>'0');
+    case granularity is
+      when BYTE     => result(adr'length-1-0 downto 0) := adr;
+      when HALFWORD => result(adr'length-1-1 downto 0) := adr(adr'left downto 1); 
+      when WORD     => result(adr'length-1-2 downto 0) := adr(adr'left downto 2);
+      when others   => null;
+    end case;
+    return std_ulogic_vector(resize(unsigned(result), target_width));
+  end function align_adr;
+
 end package body core_pkg;
 

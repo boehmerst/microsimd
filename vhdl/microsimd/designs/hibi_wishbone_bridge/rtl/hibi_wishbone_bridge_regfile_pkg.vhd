@@ -34,8 +34,8 @@ end record hibi_wishbone_bridge_regfile_ctrl_t;
 -- HIBI_DMA_CTRL register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_CTRL_integer_c  : integer := 0;
-constant addr_offset_HIBI_DMA_CTRL_unsigned_c : unsigned(9-1 downto 0) := "000000000";
-constant addr_offset_HIBI_DMA_CTRL_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000000";
+constant addr_offset_HIBI_DMA_CTRL_unsigned_c : unsigned(4-1 downto 0) := "0000";
+constant addr_offset_HIBI_DMA_CTRL_slv_c      : std_ulogic_vector(4-1 downto 0) := "0000";
 
 constant bit_offset_HIBI_DMA_CTRL_en_c : integer := 0;
 
@@ -55,8 +55,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_CTRL_reg2logic_t;
 -- HIBI_DMA_STATUS register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_STATUS_integer_c  : integer := 1;
-constant addr_offset_HIBI_DMA_STATUS_unsigned_c : unsigned(9-1 downto 0) := "000000001";
-constant addr_offset_HIBI_DMA_STATUS_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000001";
+constant addr_offset_HIBI_DMA_STATUS_unsigned_c : unsigned(4-1 downto 0) := "0001";
+constant addr_offset_HIBI_DMA_STATUS_slv_c      : std_ulogic_vector(4-1 downto 0) := "0001";
 
 constant bit_offset_HIBI_DMA_STATUS_busy0_c : integer := 0;
 constant bit_offset_HIBI_DMA_STATUS_busy1_c : integer := 1;
@@ -78,8 +78,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_STATUS_logic2reg_t;
 -- HIBI_DMA_TRIGGER register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_TRIGGER_integer_c  : integer := 2;
-constant addr_offset_HIBI_DMA_TRIGGER_unsigned_c : unsigned(9-1 downto 0) := "000000010";
-constant addr_offset_HIBI_DMA_TRIGGER_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000010";
+constant addr_offset_HIBI_DMA_TRIGGER_unsigned_c : unsigned(4-1 downto 0) := "0010";
+constant addr_offset_HIBI_DMA_TRIGGER_slv_c      : std_ulogic_vector(4-1 downto 0) := "0010";
 
 constant bit_offset_HIBI_DMA_TRIGGER_start0_c : integer := 0;
 constant bit_offset_HIBI_DMA_TRIGGER_start1_c : integer := 1;
@@ -98,8 +98,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_TRIGGER_reg2logic_t;
 -- HIBI_DMA_CFG0 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_CFG0_integer_c  : integer := 3;
-constant addr_offset_HIBI_DMA_CFG0_unsigned_c : unsigned(9-1 downto 0) := "000000011";
-constant addr_offset_HIBI_DMA_CFG0_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000011";
+constant addr_offset_HIBI_DMA_CFG0_unsigned_c : unsigned(4-1 downto 0) := "0011";
+constant addr_offset_HIBI_DMA_CFG0_slv_c      : std_ulogic_vector(4-1 downto 0) := "0011";
 
 constant bit_offset_HIBI_DMA_CFG0_count_c : integer := 0;
 constant bit_offset_HIBI_DMA_CFG0_direction_c : integer := 15;
@@ -128,16 +128,16 @@ end record hibi_wishbone_bridge_HIBI_DMA_CFG0_reg2logic_t;
 -- HIBI_DMA_MEM_ADDR0 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_MEM_ADDR0_integer_c  : integer := 4;
-constant addr_offset_HIBI_DMA_MEM_ADDR0_unsigned_c : unsigned(9-1 downto 0) := "000000100";
-constant addr_offset_HIBI_DMA_MEM_ADDR0_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000100";
+constant addr_offset_HIBI_DMA_MEM_ADDR0_unsigned_c : unsigned(4-1 downto 0) := "0100";
+constant addr_offset_HIBI_DMA_MEM_ADDR0_slv_c      : std_ulogic_vector(4-1 downto 0) := "0100";
 
 constant bit_offset_HIBI_DMA_MEM_ADDR0_addr_c : integer := 0;
 
 type hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_rw_t is record
-  addr : std_ulogic_vector(8 downto 0);
+  addr : std_ulogic_vector(2 downto 0);
 end record hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_rw_t;
 constant dflt_hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_c : hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_rw_t :=(
-  addr => "000000000"
+  addr => "000"
 );
 
 type hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_reg2logic_t is record
@@ -149,8 +149,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_reg2logic_t;
 -- HIBI_DMA_HIBI_ADDR0 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_HIBI_ADDR0_integer_c  : integer := 5;
-constant addr_offset_HIBI_DMA_HIBI_ADDR0_unsigned_c : unsigned(9-1 downto 0) := "000000101";
-constant addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000101";
+constant addr_offset_HIBI_DMA_HIBI_ADDR0_unsigned_c : unsigned(4-1 downto 0) := "0101";
+constant addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c      : std_ulogic_vector(4-1 downto 0) := "0101";
 
 constant bit_offset_HIBI_DMA_HIBI_ADDR0_addr_c : integer := 0;
 
@@ -170,8 +170,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_HIBI_ADDR0_reg2logic_t;
 -- HIBI_DMA_TRIGGER_MASK0 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_TRIGGER_MASK0_integer_c  : integer := 6;
-constant addr_offset_HIBI_DMA_TRIGGER_MASK0_unsigned_c : unsigned(9-1 downto 0) := "000000110";
-constant addr_offset_HIBI_DMA_TRIGGER_MASK0_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000110";
+constant addr_offset_HIBI_DMA_TRIGGER_MASK0_unsigned_c : unsigned(4-1 downto 0) := "0110";
+constant addr_offset_HIBI_DMA_TRIGGER_MASK0_slv_c      : std_ulogic_vector(4-1 downto 0) := "0110";
 
 constant bit_offset_HIBI_DMA_TRIGGER_MASK0_mask_c : integer := 0;
 
@@ -191,8 +191,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_TRIGGER_MASK0_reg2logic_t;
 -- HIBI_DMA_CFG1 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_CFG1_integer_c  : integer := 7;
-constant addr_offset_HIBI_DMA_CFG1_unsigned_c : unsigned(9-1 downto 0) := "000000111";
-constant addr_offset_HIBI_DMA_CFG1_slv_c      : std_ulogic_vector(9-1 downto 0) := "000000111";
+constant addr_offset_HIBI_DMA_CFG1_unsigned_c : unsigned(4-1 downto 0) := "0111";
+constant addr_offset_HIBI_DMA_CFG1_slv_c      : std_ulogic_vector(4-1 downto 0) := "0111";
 
 constant bit_offset_HIBI_DMA_CFG1_count_c : integer := 0;
 constant bit_offset_HIBI_DMA_CFG1_direction_c : integer := 15;
@@ -221,16 +221,16 @@ end record hibi_wishbone_bridge_HIBI_DMA_CFG1_reg2logic_t;
 -- HIBI_DMA_MEM_ADDR1 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_MEM_ADDR1_integer_c  : integer := 8;
-constant addr_offset_HIBI_DMA_MEM_ADDR1_unsigned_c : unsigned(9-1 downto 0) := "000001000";
-constant addr_offset_HIBI_DMA_MEM_ADDR1_slv_c      : std_ulogic_vector(9-1 downto 0) := "000001000";
+constant addr_offset_HIBI_DMA_MEM_ADDR1_unsigned_c : unsigned(4-1 downto 0) := "1000";
+constant addr_offset_HIBI_DMA_MEM_ADDR1_slv_c      : std_ulogic_vector(4-1 downto 0) := "1000";
 
 constant bit_offset_HIBI_DMA_MEM_ADDR1_addr_c : integer := 0;
 
 type hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_rw_t is record
-  addr : std_ulogic_vector(8 downto 0);
+  addr : std_ulogic_vector(2 downto 0);
 end record hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_rw_t;
 constant dflt_hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_c : hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_rw_t :=(
-  addr => "000000000"
+  addr => "000"
 );
 
 type hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_reg2logic_t is record
@@ -242,8 +242,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_reg2logic_t;
 -- HIBI_DMA_HIBI_ADDR1 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_HIBI_ADDR1_integer_c  : integer := 9;
-constant addr_offset_HIBI_DMA_HIBI_ADDR1_unsigned_c : unsigned(9-1 downto 0) := "000001001";
-constant addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c      : std_ulogic_vector(9-1 downto 0) := "000001001";
+constant addr_offset_HIBI_DMA_HIBI_ADDR1_unsigned_c : unsigned(4-1 downto 0) := "1001";
+constant addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c      : std_ulogic_vector(4-1 downto 0) := "1001";
 
 constant bit_offset_HIBI_DMA_HIBI_ADDR1_addr_c : integer := 0;
 
@@ -263,8 +263,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_HIBI_ADDR1_reg2logic_t;
 -- HIBI_DMA_TRIGGER_MASK1 register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_TRIGGER_MASK1_integer_c  : integer := 10;
-constant addr_offset_HIBI_DMA_TRIGGER_MASK1_unsigned_c : unsigned(9-1 downto 0) := "000001010";
-constant addr_offset_HIBI_DMA_TRIGGER_MASK1_slv_c      : std_ulogic_vector(9-1 downto 0) := "000001010";
+constant addr_offset_HIBI_DMA_TRIGGER_MASK1_unsigned_c : unsigned(4-1 downto 0) := "1010";
+constant addr_offset_HIBI_DMA_TRIGGER_MASK1_slv_c      : std_ulogic_vector(4-1 downto 0) := "1010";
 
 constant bit_offset_HIBI_DMA_TRIGGER_MASK1_mask_c : integer := 0;
 
@@ -284,8 +284,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_TRIGGER_MASK1_reg2logic_t;
 -- HIBI_DMA_GPIO register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_GPIO_integer_c  : integer := 11;
-constant addr_offset_HIBI_DMA_GPIO_unsigned_c : unsigned(9-1 downto 0) := "000001011";
-constant addr_offset_HIBI_DMA_GPIO_slv_c      : std_ulogic_vector(9-1 downto 0) := "000001011";
+constant addr_offset_HIBI_DMA_GPIO_unsigned_c : unsigned(4-1 downto 0) := "1011";
+constant addr_offset_HIBI_DMA_GPIO_slv_c      : std_ulogic_vector(4-1 downto 0) := "1011";
 
 constant bit_offset_HIBI_DMA_GPIO_GPIO_0_c : integer := 0;
 constant bit_offset_HIBI_DMA_GPIO_GPIO_1_c : integer := 1;
@@ -355,8 +355,8 @@ end record hibi_wishbone_bridge_HIBI_DMA_GPIO_logic2reg_t;
 -- HIBI_DMA_GPIO_DIR register
 -------------------------------------------------------------------------------
 constant addr_offset_HIBI_DMA_GPIO_DIR_integer_c  : integer := 12;
-constant addr_offset_HIBI_DMA_GPIO_DIR_unsigned_c : unsigned(9-1 downto 0) := "000001100";
-constant addr_offset_HIBI_DMA_GPIO_DIR_slv_c      : std_ulogic_vector(9-1 downto 0) := "000001100";
+constant addr_offset_HIBI_DMA_GPIO_DIR_unsigned_c : unsigned(4-1 downto 0) := "1100";
+constant addr_offset_HIBI_DMA_GPIO_DIR_slv_c      : std_ulogic_vector(4-1 downto 0) := "1100";
 
 constant bit_offset_HIBI_DMA_GPIO_DIR_GPIO_0_c : integer := 0;
 constant bit_offset_HIBI_DMA_GPIO_DIR_GPIO_1_c : integer := 1;

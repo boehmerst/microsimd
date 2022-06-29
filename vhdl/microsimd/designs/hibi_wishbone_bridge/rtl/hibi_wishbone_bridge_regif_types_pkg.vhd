@@ -25,7 +25,7 @@ use ieee.numeric_std.all;
 
 package hibi_wishbone_bridge_regif_types_pkg is
 
-constant hibi_wishbone_bridge_addr_width_c : integer := 9;
+constant hibi_wishbone_bridge_addr_width_c : integer := 4;
 constant hibi_wishbone_bridge_data_width_c : integer := 32;
 
 type hibi_wishbone_bridge_gif_req_t is record

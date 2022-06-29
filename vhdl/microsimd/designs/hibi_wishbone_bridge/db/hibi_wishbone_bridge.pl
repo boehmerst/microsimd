@@ -69,7 +69,7 @@ my $ref_dma_addr0 = {
   name   => 'HIBI_DMA_MEM_ADDR0',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 8],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 2],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 
@@ -108,7 +108,7 @@ my $ref_dma_addr1 = {
   name   => 'HIBI_DMA_MEM_ADDR1',
   desc   => 'memory address',
   fld    => [
-    { name => 'addr',    slc => [0, 8],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
+    { name => 'addr',    slc => [0, 2],  type => 'rw',  rst => 0x00,  desc => 'memory address' },
   ]
 };
 

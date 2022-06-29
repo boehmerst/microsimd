@@ -26,7 +26,7 @@ use ieee.numeric_std.all;
 package hibi_wishbone_bridge_pkg is
 
   constant hibi_wishbone_bridge_hibi_addr_width_c : natural := 16;
-  constant hibi_wishbone_bridge_mem_addr_width_c  : natural := 9;
+  constant hibi_wishbone_bridge_mem_addr_width_c  : natural := 3;
   constant hibi_wishbone_bridge_mem_data_width_c  : natural := 32;
   constant hibi_wishbone_bridge_count_width_c     : natural := 10;
   constant hibi_wishbone_bridge_channels_c        : natural := 2;

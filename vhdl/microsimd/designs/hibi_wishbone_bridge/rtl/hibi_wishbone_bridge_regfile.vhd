@@ -175,7 +175,7 @@ begin
       HIBI_DMA_MEM_ADDR0 <= dflt_hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR0_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR0_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR0.addr <= gif_req_i.wdata(8 downto 0);
+        HIBI_DMA_MEM_ADDR0.addr <= gif_req_i.wdata(2 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -183,7 +183,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR0 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(8 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(2 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -327,7 +327,7 @@ begin
       HIBI_DMA_MEM_ADDR1 <= dflt_hibi_wishbone_bridge_HIBI_DMA_MEM_ADDR1_c;
     elsif(rising_edge(clk_i)) then
       if(gif_req_i.addr = addr_offset_HIBI_DMA_MEM_ADDR1_slv_c and gif_req_i.wr = '1') then
-        HIBI_DMA_MEM_ADDR1.addr <= gif_req_i.wdata(8 downto 0);
+        HIBI_DMA_MEM_ADDR1.addr <= gif_req_i.wdata(2 downto 0);
 --pragma translate_off
         if(enable_msg_c) then
           write(wr, string'("Time: "));
@@ -335,7 +335,7 @@ begin
           write(wr, string'(" (") & module_name_c & string'(") HIBI_DMA_MEM_ADDR1 write access: "));
           writeline(output, wr);
           write(wr, string'("  -> addr: ") &
-          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(8 downto 0))) );
+          string'("0x") & hstr(std_logic_vector(gif_req_i.wdata(2 downto 0))) );
           writeline(output, wr);
         end if;
 --pragma translate_on
@@ -570,7 +570,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG0.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR0_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(8 downto 0) <= HIBI_DMA_MEM_ADDR0.addr;
+            gif_rsp_o.rdata(2 downto 0) <= HIBI_DMA_MEM_ADDR0.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR0_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR0.addr;
@@ -585,7 +585,7 @@ begin
             gif_rsp_o.rdata(21) <= HIBI_DMA_CFG1.const_addr;
           when addr_offset_HIBI_DMA_MEM_ADDR1_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
-            gif_rsp_o.rdata(8 downto 0) <= HIBI_DMA_MEM_ADDR1.addr;
+            gif_rsp_o.rdata(2 downto 0) <= HIBI_DMA_MEM_ADDR1.addr;
           when addr_offset_HIBI_DMA_HIBI_ADDR1_slv_c =>
             gif_rsp_o.rdata <= (others=>'0');
             gif_rsp_o.rdata(15 downto 0) <= HIBI_DMA_HIBI_ADDR1.addr;

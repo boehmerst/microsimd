@@ -142,7 +142,7 @@ begin
     host_mem_req.dat    <= std_ulogic_vector(resize(unsigned(host_gif_req(gif_bus_t'pos(mem)).wdata), host_mem_req.dat'length));
     memi0_gif_rsp.rdata <= std_ulogic_vector(resize(unsigned(memi0_port_a_rsp.dat), memi0_gif_rsp.rdata'length));
 
-    bridge_mem_req.adr  <= "00" & bridgei0_mem_req.adr(bridgei0_mem_req.adr'left downto 2);
+    bridge_mem_req.adr  <= bridgei0_mem_req.adr;
     bridge_mem_req.we   <= bridgei0_mem_req.we;
     bridge_mem_req.ena  <= bridgei0_mem_req.ena;
     bridge_mem_req.dat  <= bridgei0_mem_req.dat;
@@ -152,7 +152,7 @@ begin
     memi0: entity work.dual_port_buffer
       generic map (
         data_width_g => hibi_wishbone_bridge_mem_data_width_c,
-	addr_width_g => hibi_wishbone_bridge_mem_addr_width_c-2
+	addr_width_g => hibi_wishbone_bridge_mem_addr_width_c
       )
       port map (
         clk_i        => clk_i,
