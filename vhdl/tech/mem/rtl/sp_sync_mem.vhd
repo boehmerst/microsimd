@@ -102,9 +102,11 @@ sky130: if target_tech_c = tech_sky130_c generate
     wmask0 <= we_i;
 
     memi0: entity work.sky130_sram_2kbyte_1rw1r_32x512_8
+    -- pragma translate_off
       generic map (
         file_name_g => file_name_g
       )
+    -- pragma translate_on
       port map (
         clk0   => clk_i,
         csb0   => csb0,

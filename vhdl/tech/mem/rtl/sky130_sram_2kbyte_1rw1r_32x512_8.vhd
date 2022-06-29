@@ -2,13 +2,15 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
---library std;
 use std.textio.all;
 
 entity sky130_sram_2kbyte_1rw1r_32x512_8 is
+  -- pragma translate_off
+  -- NOTE: We do this to avoid 'GHDL --synth' to change module name because of generics
   generic (
     file_name_g : string := "none"
   );
+  -- pragma translate_on
   port (
     vccd1  : inout std_ulogic := '1';
     vssd1  : inout std_ulogic := '1';
@@ -52,6 +54,7 @@ architecture beh of sky130_sram_2kbyte_1rw1r_32x512_8 is
   -------------------------------------------------------------------------------
   -- mem_init
   -------------------------------------------------------------------------------
+  -- pragma translate_off
   procedure mem_init(signal RAM : inout ram_t) is
     file     readfile       : text open read_mode is file_name_g;
     variable vecline        : line;
@@ -86,6 +89,7 @@ architecture beh of sky130_sram_2kbyte_1rw1r_32x512_8 is
     end loop;
     assert false report "Memory filling successfull" severity note;
   end procedure mem_init;
+  -- pragma translate_on
 
   constant random_pattern_c : std_ulogic_vector(din0'length-1 downto 0) := std_ulogic_vector(resize(unsigned'(X"DEADBEAFAFFEDEAD"), din0'length));
 
@@ -124,11 +128,12 @@ begin
   write0: process(clk0) is
     variable readcontents : boolean := true;
   begin
-
+    -- pragma translate_off
     if(readcontents = true and file_name_g /= "none") then
       mem_init(mem);
     end if;
     readcontents := false;
+    -- pragma translate_on
 
     if rising_edge(clk0) then
       if(csb0_reg = '0' and web0_reg = '0') then

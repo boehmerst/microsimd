@@ -4,11 +4,13 @@ use ieee.numeric_std.all;
 
 
 entity sky130_sram_2kbyte_1rw1r_32x512_8_wrapper is
+  -- pragma translate_off
   generic (
     file_name_g  : string := "none";
     addr_width_g : integer;
     data_width_g : integer
   );
+  -- pragma translate_on
   port (
     clk_i  : in  std_logic;
     we_i   : in  std_logic_vector(data_width_g/8-1 downto 0);
@@ -42,9 +44,11 @@ begin
   wmask0 <= we_i;
 
   memi0: entity work.sky130_sram_2kbyte_1rw1r_32x512_8
+    -- pragma translate_off
     generic map (
       file_name_g => file_name_g
     )
+    -- pragma translate_on
     port map (
       clk0   => clk_i,
       csb0   => csb0,
