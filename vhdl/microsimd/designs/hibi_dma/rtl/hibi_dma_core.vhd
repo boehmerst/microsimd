@@ -347,7 +347,7 @@ begin
 
       when pull_mem        => if(mem_wait_i = '0') then
                                 if(cfg_i(tx_channel).const_addr = '0') then
-                                  v.tx.describtor.mem_req.addr := r.tx.describtor.mem_req.addr + 4;
+                                  v.tx.describtor.mem_req.addr := r.tx.describtor.mem_req.addr + 1;
                                 end if;
 
                                 if(v.tx.describtor.burst_count = 1) then
@@ -483,7 +483,7 @@ begin
 
       when push_mem        => if(mem_wait_i = '0') then
                                 if(cfg_i(rx_channel).const_addr = '0') then
-                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 4;
+                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 1;
                                 end if;
 
                                 if(v.rx.describtor.burst_count = 0) then

@@ -6,6 +6,8 @@ library microsimd;
 use microsimd.hibi_link_pkg.all;
 use microsimd.hibi_mem_pkg.all;
 
+library tech;
+
 entity hibi_mem_wrapper is
   generic (
     log2_burst_length_g : integer range 2 to 5 := 4
@@ -68,18 +70,18 @@ begin
   begin   
     mem_we <= "1111" when memi0_mem_req.we = '1' else "0000";
 
-    memi0 : entity microsimd.sram_4en
+    memi0 : entity tech.sp_sync_mem
       generic map (
         data_width_g => hibi_mem_mem_data_width_c,
-        addr_width_g => hibi_mem_mem_addr_width_c-2
+        addr_width_g => hibi_mem_mem_addr_width_c
       )
       port map (
         clk_i  => clk_i,
-        wre_i  => mem_we,
-        ena_i  => memi0_mem_req.ena,
-        addr_i => memi0_mem_req.adr(hibi_mem_mem_addr_width_c-1 downto 2),
-        dat_i  => memi0_mem_req.dat,
-        dat_o  => mem_dat
+        we_i   => mem_we,
+        en_i   => memi0_mem_req.ena,
+        addr_i => memi0_mem_req.adr,
+        di_i   => memi0_mem_req.dat,
+        do_o   => mem_dat
       );
        
      mem_rsp.dat <= mem_dat;
