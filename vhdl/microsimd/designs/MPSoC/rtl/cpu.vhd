@@ -44,7 +44,7 @@ architecture rtl of cpu is
 
   constant nr_mem_blocks_c       : integer   := xbar_slv_t'pos(xbar_slv_t'right)+1;
   constant mem_block_size_c      : integer   := log2ceil(512);
-  constant ram_size_c            : integer   := mem_block_size_c+2;
+  constant ram_size_c            : integer   := log2ceil(nr_mem_blocks_c * 512);
   
   signal imem                    : imem_in_t;
   signal dmem                    : dmem_in_t;
@@ -135,19 +135,19 @@ begin
   ------------------------------------------------------------------------------
   -- memory xbar (vector memory transfers handled and serialized by core LSU)
   ------------------------------------------------------------------------------
-  xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.addr <= corei0_imem.adr;
+  xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.addr <= microsimd.core_pkg.align_adr(corei0_imem.adr, dflt_xbar_ctrl_c.addr'length, WORD);
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.sel  <= (others => '1');
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.wr   <= '0';
   xbar_mst_req(xbar_mst_t'pos(imst)).ctrl.en   <= corei0_imem.ena;
   xbar_mst_req(xbar_mst_t'pos(imst)).wdata     <= (others=>'0');
 
-  xbar_mst_req(xbar_mst_t'pos(dmst)).ctrl.addr <= corei0_dmem.scu.adr;
+  xbar_mst_req(xbar_mst_t'pos(dmst)).ctrl.addr <= microsimd.core_pkg.align_adr(corei0_dmem.scu.adr, dflt_xbar_ctrl_c.addr'length, WORD);
   xbar_mst_req(xbar_mst_t'pos(dmst)).ctrl.sel  <= corei0_dmem.scu.sel;
   xbar_mst_req(xbar_mst_t'pos(dmst)).ctrl.wr   <= corei0_dmem.scu.we;
   xbar_mst_req(xbar_mst_t'pos(dmst)).ctrl.en   <= corei0_dmem.scu.ena;
   xbar_mst_req(xbar_mst_t'pos(dmst)).wdata     <= corei0_dmem.scu.dat;
   
-  xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.addr <= hibi_dmai0_mem_req.adr;
+  xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.addr <= std_ulogic_vector(resize(unsigned(hibi_dmai0_mem_req.adr), dflt_xbar_ctrl_c.addr'length));
   xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.sel  <= (others=>'1');
   xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.wr   <= hibi_dmai0_mem_req.we;
   xbar_mst_req(xbar_mst_t'pos(dma)).ctrl.en   <= hibi_dmai0_mem_req.ena;
@@ -158,7 +158,7 @@ begin
   -----------------------------------------------------------------------------
   xbari0: entity microsimd.xbar
     generic map (
-      log2_wsize_g   => ram_size_c,
+      log2_wsize_g   => mem_block_size_c,
       nr_mst_g       => nr_mst_c,
       nr_slv_g       => nr_slv_c
     )
@@ -183,7 +183,7 @@ begin
     signal mem_en  : std_ulogic;
   begin   
     mem_we <= xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.sel when xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.wr = '1' else "0000";
-    mem_en <= xbari0_slv_req(0).ctrl.en;    
+    mem_en <= xbari0_slv_req(0).ctrl.en;
 
     memi0 : entity tech.sp_sync_mem
       generic map (
@@ -194,7 +194,7 @@ begin
         clk_i  => clk_i,
         we_i   => mem_we,
         en_i   => mem_en,
-        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.addr(ram_size_c-1 downto 2),
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem0)).ctrl.addr(mem_block_size_c-1 downto 0),
         di_i   => xbari0_slv_req(xbar_slv_t'pos(mem0)).wdata,
         do_o   => mem_dat
       );
@@ -222,7 +222,7 @@ begin
         clk_i  => clk_i,
         we_i   => mem_we,
         en_i   => mem_en,
-        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.addr(ram_size_c-1 downto 2),
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem1)).ctrl.addr(mem_block_size_c-1 downto 0),
         di_i   => xbari0_slv_req(xbar_slv_t'pos(mem1)).wdata,
         do_o   => mem_dat
       );
@@ -250,7 +250,7 @@ begin
         clk_i  => clk_i,
         we_i   => mem_we,
         en_i   => mem_en,
-        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.addr(ram_size_c-1 downto 2),
+        addr_i => xbari0_slv_req(xbar_slv_t'pos(mem2)).ctrl.addr(mem_block_size_c-1 downto 0),
         di_i   => xbari0_slv_req(xbar_slv_t'pos(mem2)).wdata,
         do_o   => mem_dat
       );
