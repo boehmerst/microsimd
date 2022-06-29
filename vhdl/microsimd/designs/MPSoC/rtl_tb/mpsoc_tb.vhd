@@ -33,7 +33,8 @@ architecture beh of mpsoc_tb is
 
   type hibi_dma_direction_t is (send, receive);
 
-  constant hibi_remote_dma_cfg_buffer_c : std_ulogic_vector := x"80000000";
+  constant hibi_remote_dma_cfg_buffer_c :      std_ulogic_vector := x"80000000";
+  constant hibi_remote_dma_cfg_buffer_size_c : integer           := 1;
 
   ------------------------------------------------------------------------------
   -- generic wb transfer
@@ -383,7 +384,7 @@ architecture beh of mpsoc_tb is
   end procedure hibi_remote_dma_start;
 
 
-  constant host_rom_size_c         : integer   := 15;
+  constant host_rom_size_c         : integer   := 13;
   constant host_rom_data_width_c   : integer   := 32;
 
   constant nr_cols_c               : integer   := 40;
@@ -406,11 +407,11 @@ architecture beh of mpsoc_tb is
   signal rxpif                     : hibi_pif_arr_t(0 to 1) := (others => dflt_hibi_pif_c);
 
   constant host_rom_file_name_c    : string  := "./rom/rom.mem";
-  constant host_rom_entries_c      : integer := (2**(host_rom_size_c-2));
+  constant host_rom_entries_c      : integer := 2**host_rom_size_c;
 
   type ram_type is array (host_rom_entries_c-1 downto 0) of std_ulogic_vector (host_rom_data_width_c-1 downto 0);
 
-  constant bridge_buffer_entries_c : integer := (2**(hibi_wishbone_bridge_mem_addr_width_c-2));
+  constant bridge_buffer_entries_c : integer := 2**hibi_wishbone_bridge_mem_addr_width_c - hibi_remote_dma_cfg_buffer_size_c;
 
 
   -------------------------------------------------------------------------------
@@ -420,7 +421,7 @@ architecture beh of mpsoc_tb is
     file     readfile       : text open read_mode is file_name;
     variable vecline        : line;
 
-    variable add_ulv        : std_ulogic_vector(host_rom_size_c-2-1 downto 0);
+    variable add_ulv        : std_ulogic_vector(host_rom_size_c-1 downto 0);
     variable var_ulv        : std_ulogic_vector(host_rom_data_width_c-1 downto 0);
 
     variable add_int        : natural   := 0;
@@ -499,7 +500,7 @@ begin
     variable boot_loop_iterations   : natural;
     variable boot_loop_remains      : natural;
     variable local_boot_addr        : unsigned(dflt_wb_req_c.dat'length-1 downto 0);
-    variable local_boot_addr_offset : unsigned(dflt_wb_req_c.dat'length-1 downto 0) := (2 downto 0 => "100", others => '0');
+    variable local_boot_addr_offset : unsigned(dflt_wb_req_c.dat'length-1 downto 0) := (0 => '1', others => '0');
 
   begin
     mem_init(ROM, host_rom_file_name_c, rom_size);
@@ -509,8 +510,8 @@ begin
     
     wait for 2 us;
 
-    -- enable logic but not the cores (HIBI transfer enabled IP functionality still disabled -> ready for boot)
-    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c sll 2, x"00F0", host_req, host_rsp, clk);
+    -- enable logic but not the cores (HIBI transfer enabled but IP functionality still disabled -> ready for boot)
+    wishbone_write(addr_offset_HIBI_DMA_GPIO_slv_c, x"00F0", host_req, host_rsp, clk);
     
     wait for 2 us;
 
@@ -528,44 +529,44 @@ begin
     hibi_send_prio_b(target_hibi_addr or std_logic_vector(resize(microsimd.hibi_dma_regfile_pkg.addr_offset_HIBI_DMA_GPIO_DIR_unsigned_c, target_hibi_addr'length)), hibi_remote_dma_cfg_buffer_c, 1, host_req, host_rsp, clk);
 
 
-    wait for 2 us;
+    wait for 20 us;
 
-    boot_loop_iterations := rom_size / (bridge_buffer_entries_c - to_integer(local_boot_addr_offset));
-    boot_loop_remains    := rom_size rem (bridge_buffer_entries_c - to_integer(local_boot_addr_offset));
+    boot_loop_iterations := rom_size / bridge_buffer_entries_c;
+    boot_loop_remains    := rom_size rem bridge_buffer_entries_c;
     local_boot_addr      := (local_boot_addr'left => '1', others => '0');
     local_boot_addr      := local_boot_addr + local_boot_addr_offset;
 
     if boot_loop_iterations > 0 then
       boot0: for i in 0 to boot_loop_iterations-1 loop
+        assert false report "I tell you what..." severity warning;
+
         for j in 0 to bridge_buffer_entries_c-1 loop
-          wishbone_write(std_logic_vector(local_boot_addr), ROM(i), host_req, host_rsp, clk);
+          wishbone_write(std_logic_vector(local_boot_addr), ROM(i*bridge_buffer_entries_c + j), host_req, host_rsp, clk);
           local_boot_addr  := local_boot_addr + 1;
         end loop;
       
         hibi_remote_dma_rx_setup(target_hibi_addr, 0, std_logic_vector(target_boot_addr), bridge_buffer_entries_c, host_req, host_rsp, clk);
         hibi_remote_dma_start(target_hibi_addr, x"0001", host_req, host_rsp, clk);
-        hibi_local_dma_send(0, target_hibi_addr, std_logic_vector(local_boot_addr_offset), bridge_buffer_entries_c, host_req, host_rsp, clk);
+        hibi_send_b(target_hibi_addr, std_logic_vector(local_boot_addr_offset), bridge_buffer_entries_c, host_req, host_rsp, clk);
 
-	target_boot_addr   := target_boot_addr + 4*bridge_buffer_entries_c;
+	target_boot_addr   := target_boot_addr + bridge_buffer_entries_c;
 	local_boot_addr    := (local_boot_addr'left => '1', others => '0');
         local_boot_addr    := local_boot_addr + local_boot_addr_offset;
       end loop boot0;
     end if;
 
-    wait for 2 us;
-
     if boot_loop_remains > 0 then
       boot1: for i in 0 to boot_loop_remains-1 loop
-        wishbone_write(std_logic_vector(local_boot_addr), ROM(i), host_req, host_rsp, clk);
+        wishbone_write(std_logic_vector(local_boot_addr), ROM(boot_loop_iterations*bridge_buffer_entries_c + i), host_req, host_rsp, clk);
         local_boot_addr  := local_boot_addr + 1;
       end loop boot1;
 
       hibi_remote_dma_rx_setup(target_hibi_addr, 0, std_logic_vector(target_boot_addr), boot_loop_remains, host_req, host_rsp, clk);
       hibi_remote_dma_start(target_hibi_addr, x"0001", host_req, host_rsp, clk);
-      hibi_local_dma_send(0, target_hibi_addr, std_logic_vector(local_boot_addr_offset), boot_loop_remains, host_req, host_rsp, clk);
+      hibi_send_b(target_hibi_addr, std_logic_vector(local_boot_addr_offset), boot_loop_remains, host_req, host_rsp, clk);
     end if;
 
-    wait for 2 us;
+    wait for 20 us;
 
 
     -- enable cores also... ready to rock
