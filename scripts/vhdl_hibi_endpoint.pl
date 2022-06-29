@@ -36,7 +36,7 @@ my %option =
     'mem_data_width'   => { 'string' => 'mem_data_width|mdw=i',   'ref' => \$mem_data_width,  'help' => 'Specify memory data width'             },    
     'count_width'      => { 'string' => 'count_width|cnt=i',      'ref' => \$count_width,     'help' => 'Specify transfer counter width'        },
     'channels'         => { 'string' => 'channels|ch=i',          'ref' => \$channels,        'help' => 'Specify number of channels'            },
-    'hostif'           => { 'string' => 'hostif|hi=s',              'ref' => \$hostif,          'help' => 'DMA has external host interface'       },
+    'hostif'           => { 'string' => 'hostif|hi=s',            'ref' => \$hostif,          'help' => 'DMA has external host interface'       },
     'chaining'         => { 'string' => 'chaining|chn',           'ref' => \$chaining,        'help' => 'Support for chaining DMA transfers'    },
     'custom_db'        => { 'string' => 'custom_db|cdb=s',        'ref' => \$custom_db,       'help' => 'Provide database with cutom registers' },
     'gpio'             => { 'string' => 'gpio|g',                 'ref' => \$gpio,            'help' => 'Support for GPIO'                      },
@@ -88,6 +88,7 @@ system("vhdl_hibi_endpoint_db_gen.pl --entity=$entity --hibi_addr_width=$hibi_ad
   " --count_width=$count_width --channels=$channels $args;");
 
 if(defined($hostif)) {
+  die if not ($hostif eq "full" or $hostif eq "mem" or $hostif eq "regfile");
   $args = $args . " --hostif";
 }
 
@@ -98,7 +99,15 @@ system("vhdl_hibi_endpoint_pkg_gen.pl -entity=$entity --hibi_addr_width=$hibi_ad
 
 
 # TODO: Make this overideable
-my $register_count = 3 + 4*$channels;
+my $register_count = 3;
+
+if (defined($chaining)) {
+  $register_count += 4*$channels;
+} 
+else {
+  $register_count += 3*$channels;
+}
+
 if(defined($gpio)) {
   $register_count  += 3;
 }
@@ -111,11 +120,10 @@ my $reg_width           = max $mem_addr_width, $max_known_reg_width;
 
 if(defined($hostif)) {
   if($hostif eq "full" or $hostif eq "mem") {
-    $addr_width = $mem_addr_width;
-    $reg_width  = $mem_data_width;
+    $addr_width = max $mem_addr_width, $addr_width;
+    $reg_width  = max $mem_data_width, $reg_width;
   }
 }
-
 
 if(defined($custom_db)) {
   system("vhdl_regfile_gen.pl --database=./$entity" . ".pl" . " --database=$custom_db" . " --addr_width=$addr_width --data_width=$reg_width --lib=$lib;");

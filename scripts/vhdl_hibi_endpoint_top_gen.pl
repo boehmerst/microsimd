@@ -328,9 +328,9 @@ print $fh
 "  ------------------------------------------------------------------------------\n";
 for(my $i = 0; $i < $channels; $i++) {
   print $fh 
-"    chain_mask($i)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK$i.rw.mask;\n" .
-"    chain_start($i)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start$i;\n" .
-"    chain_busy($i)    <= dmai0_status($i).busy;\n" .
+"  chain_mask($i)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK$i.rw.mask;\n" .
+"  chain_start($i)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start$i;\n" .
+"  chain_busy($i)    <= dmai0_status($i).busy;\n" .
 "\n";
 }
 

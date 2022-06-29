@@ -402,7 +402,7 @@ print $fh
 "\n" .    
 "      when pull_mem        => if(mem_wait_i = '0') then\n" .
 "                                if(cfg_i(tx_channel).const_addr = '0') then\n" .
-"                                  v.tx.describtor.mem_req.addr := r.tx.describtor.mem_req.addr + 4;\n" .
+"                                  v.tx.describtor.mem_req.addr := r.tx.describtor.mem_req.addr + 1;\n" .
 "                                end if;\n" .
 "\n" .
 "                                if(v.tx.describtor.burst_count = 1) then\n" .
@@ -538,7 +538,7 @@ print $fh
 "\n" .                            
 "      when push_mem        => if(mem_wait_i = '0') then\n" .
 "                                if(cfg_i(rx_channel).const_addr = '0') then\n" .
-"                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 4;\n" .
+"                                  v.rx.describtor.mem_req.addr      := r.rx.describtor.mem_req.addr + 1;\n" .
 "                                end if;\n" .
 "\n" .                             
 "                                if(v.rx.describtor.burst_count = 0) then\n" .
