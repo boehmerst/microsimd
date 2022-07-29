@@ -12,9 +12,6 @@ entity sky130_sram_2kbyte_1rw1r_32x512_8 is
   );
   -- pragma translate_on
   port (
-    vccd1  : inout std_ulogic := '1';
-    vssd1  : inout std_ulogic := '1';
-
     clk0   : in    std_ulogic;
     csb0   : in    std_ulogic;
     web0   : in    std_ulogic;
@@ -22,7 +19,6 @@ entity sky130_sram_2kbyte_1rw1r_32x512_8 is
     addr0  : in    std_ulogic_vector( 8 downto 0);
     din0   : in    std_ulogic_vector(31 downto 0);
     dout0  : out   std_ulogic_vector(31 downto 0);
-
     clk1   : in    std_ulogic;
     csb1   : in    std_ulogic;
     addr1  : in    std_ulogic_vector( 8 downto 0);

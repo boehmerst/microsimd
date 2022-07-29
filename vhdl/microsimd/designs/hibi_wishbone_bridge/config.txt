@@ -1,2 +1,2 @@
-/home/deboehse/VLSI/projects/microsimd/scripts/vhdl_hibi_endpoint.pl --entity=hibi_wishbone_bridge --unit=hibi_wishbone_bridge --mem_addr_width=9 --channels 2 --hostif --chaining --custom_db=/home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/db/hibi_wishbone_bridge_custom_regs.pl --gpio
+/home/deboehse/VLSI/projects/microsimd/scripts/vhdl_hibi_endpoint.pl --entity=hibi_wishbone_bridge --unit=hibi_wishbone_bridge --mem_addr_width=3 --channels 2 --hostif=full --chaining --gpio
 

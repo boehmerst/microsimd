@@ -95,21 +95,21 @@ begin
   ------------------------------------------------------------------------------
   -- hibi dma chaining
   ------------------------------------------------------------------------------
-    chain_mask(0)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK0.rw.mask;
-    chain_start(0)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start0;
-    chain_busy(0)    <= dmai0_status(0).busy;
+  chain_mask(0)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK0.rw.mask;
+  chain_start(0)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start0;
+  chain_busy(0)    <= dmai0_status(0).busy;
 
-    chain_mask(1)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK1.rw.mask;
-    chain_start(1)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start1;
-    chain_busy(1)    <= dmai0_status(1).busy;
+  chain_mask(1)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK1.rw.mask;
+  chain_start(1)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start1;
+  chain_busy(1)    <= dmai0_status(1).busy;
 
-    chain_mask(2)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK2.rw.mask;
-    chain_start(2)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start2;
-    chain_busy(2)    <= dmai0_status(2).busy;
+  chain_mask(2)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK2.rw.mask;
+  chain_start(2)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start2;
+  chain_busy(2)    <= dmai0_status(2).busy;
 
-    chain_mask(3)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK3.rw.mask;
-    chain_start(3)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start3;
-    chain_busy(3)    <= dmai0_status(3).busy;
+  chain_mask(3)    <= regifi0_reg2logic.HIBI_DMA_TRIGGER_MASK3.rw.mask;
+  chain_start(3)   <= regifi0_reg2logic.HIBI_DMA_TRIGGER.c.wr and regifi0_reg2logic.HIBI_DMA_TRIGGER.xw.start3;
+  chain_busy(3)    <= dmai0_status(3).busy;
 
   chaini0: for i in 0 to hibi_mem_channels_c-1 generate
     chain_trigger(i) <= chaini0_trigger(i);

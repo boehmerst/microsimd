@@ -10,9 +10,9 @@ use microsimd.xbar_pkg.all;
 
 entity xbar is
   generic (
-    log2_wsize_g : integer := 10;
-    nr_mst_g     : integer :=  4;
-    nr_slv_g     : integer :=  4
+    log2_wsize_g   : integer := 10;
+    nr_mst_g       : integer :=  4;
+    nr_slv_g       : integer :=  4
   );
   port (
     clk_i          : in  std_ulogic;
@@ -114,10 +114,10 @@ architecture rtl of xbar is
     curr_mst     : mst_req_t;
   end record reg_t;
   constant dflt_reg_c : reg_t :=(
-    state        => (others=>single),
-    req_latch    => (others=>dflt_xbar_req_c),
-    rsp_latch    => (others=>dflt_xbar_rsp_c),
-    slv_wait_req => (others=>'0'),
+    state        => (others => single),
+    req_latch    => (others => dflt_xbar_req_c),
+    rsp_latch    => (others => dflt_xbar_rsp_c),
+    slv_wait_req => (others => '0'),
     wait_req     => '0',
     mst_req      => dflt_mst_req_c,
     curr_mst     => dflt_mst_req_c

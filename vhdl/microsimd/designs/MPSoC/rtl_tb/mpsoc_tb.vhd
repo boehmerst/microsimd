@@ -11,26 +11,28 @@ use general.general_function_pkg.log2ceil;
 library microsimd;
 use microsimd.func_pkg.all;
 use microsimd.hibi_link_pkg.all;
+use microsimd.hibi_seg_r1_pkg.all;
 use microsimd.hibi_pif_types_pkg.all;
 use microsimd.hibi_wishbone_bridge_regif_types_pkg.all;
 use microsimd.hibi_wishbone_bridge_regfile_pkg.all;
 use microsimd.hibi_wishbone_bridge_pkg.all;
 use microsimd.wishbone_pkg.all;
 
+
 entity mpsoc_tb is
 end entity mpsoc_tb;
 
 architecture beh of mpsoc_tb is
 
+  --subtype my_xbar_ctrl_t is xbar_ctrl_t(addr(31 downto 0), sel(3 downto 0));
+  --signal my_xbar_ctrl : my_xbar_ctrl_t;
+  --constant dflt_xbar_ctrl_c : my_xbar_ctrl_t := dlft_xbar_crtl( my_xbar_ctrl );
+
+
   -----------------------------------------------------------------------------
   -- TODO: find a better place
   -----------------------------------------------------------------------------
   type hibi_targets_t is (CPU0, MEM, BRIDGE, PIF);
-  type hibi_addr_array_t is array (0 to 3) of integer;
-  constant hibi_addresses_c : hibi_addr_array_t :=(
-    16#1000#, 16#3000#, 16#5000#, 16#7000#
-  );
-
   type hibi_dma_direction_t is (send, receive);
 
   constant hibi_remote_dma_cfg_buffer_c :      std_ulogic_vector := x"80000000";
@@ -538,7 +540,6 @@ begin
 
     if boot_loop_iterations > 0 then
       boot0: for i in 0 to boot_loop_iterations-1 loop
-        assert false report "I tell you what..." severity warning;
 
         for j in 0 to bridge_buffer_entries_c-1 loop
           wishbone_write(std_logic_vector(local_boot_addr), ROM(i*bridge_buffer_entries_c + j), host_req, host_rsp, clk);

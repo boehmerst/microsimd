@@ -57,7 +57,6 @@ begin
       addr0  => addr0,
       din0   => din0,
       dout0  => dout0,
-
       clk1   => clk_i,
       csb1   => '1',
       addr1  => (others=>'0'),

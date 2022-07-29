@@ -39,6 +39,7 @@ architecture rtl of msmp is
   constant use_hibi_pif_c    : integer := 0;
   constant use_hibi_mem_c    : integer := 1;
   constant use_hibi_bridge_c : integer := 1;
+
   constant nr_agents_c       : integer := nr_cpus_g + use_hibi_mem_c + use_hibi_bridge_c + use_hibi_pif_c;
   constant hibi_mem_idx_c    : integer := nr_cpus_g;
   constant hibi_bridge_idx_c : integer := hibi_mem_idx_c    + use_hibi_mem_c;

@@ -2,12 +2,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library hibi;
+use hibi.hibiv3_pkg.all;
+
 library microsimd;
 use microsimd.hibi_link_pkg.all;
 use microsimd.func_pkg.all;
+use microsimd.hibi_seg_r1_pkg.all;
 
-library hibi;
-use hibi.hibiv3_pkg.all;
 
 entity hibi_seg_r1 is
   generic (
@@ -50,13 +52,6 @@ entity hibi_seg_r1 is
 end entity hibi_seg_r1;
 
 architecture rtl of hibi_seg_r1 is
-  -----------------------------------------------------------------------------
-  -- hibi addresses need to be adapted -> move to configuration package
-  -----------------------------------------------------------------------------
-  type hibi_addr_array_t is array (0 to 3) of integer;
-  constant hibi_addresses_c : hibi_addr_array_t :=(
-    16#1000#, 16#3000#, 16#5000#, 16#7000#
-  );
 
   type comm_array_t is array(natural range 0 to n_agents_g-1) of std_logic_vector(comm_width_g-1 downto 0);
   type data_array_t is array(natural range 0 to n_agents_g-1) of std_logic_vector(data_width_g-1 downto 0);

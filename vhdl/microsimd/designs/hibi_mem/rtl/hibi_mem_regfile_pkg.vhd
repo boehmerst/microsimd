@@ -142,10 +142,10 @@ constant addr_offset_HIBI_DMA_MEM_ADDR0_slv_c      : std_ulogic_vector(5-1 downt
 constant bit_offset_HIBI_DMA_MEM_ADDR0_addr_c : integer := 0;
 
 type hibi_mem_HIBI_DMA_MEM_ADDR0_rw_t is record
-  addr : std_ulogic_vector(9 downto 0);
+  addr : std_ulogic_vector(8 downto 0);
 end record hibi_mem_HIBI_DMA_MEM_ADDR0_rw_t;
 constant dflt_hibi_mem_HIBI_DMA_MEM_ADDR0_c : hibi_mem_HIBI_DMA_MEM_ADDR0_rw_t :=(
-  addr => "0000000000"
+  addr => "000000000"
 );
 
 type hibi_mem_HIBI_DMA_MEM_ADDR0_reg2logic_t is record
@@ -235,10 +235,10 @@ constant addr_offset_HIBI_DMA_MEM_ADDR1_slv_c      : std_ulogic_vector(5-1 downt
 constant bit_offset_HIBI_DMA_MEM_ADDR1_addr_c : integer := 0;
 
 type hibi_mem_HIBI_DMA_MEM_ADDR1_rw_t is record
-  addr : std_ulogic_vector(9 downto 0);
+  addr : std_ulogic_vector(8 downto 0);
 end record hibi_mem_HIBI_DMA_MEM_ADDR1_rw_t;
 constant dflt_hibi_mem_HIBI_DMA_MEM_ADDR1_c : hibi_mem_HIBI_DMA_MEM_ADDR1_rw_t :=(
-  addr => "0000000000"
+  addr => "000000000"
 );
 
 type hibi_mem_HIBI_DMA_MEM_ADDR1_reg2logic_t is record
@@ -328,10 +328,10 @@ constant addr_offset_HIBI_DMA_MEM_ADDR2_slv_c      : std_ulogic_vector(5-1 downt
 constant bit_offset_HIBI_DMA_MEM_ADDR2_addr_c : integer := 0;
 
 type hibi_mem_HIBI_DMA_MEM_ADDR2_rw_t is record
-  addr : std_ulogic_vector(9 downto 0);
+  addr : std_ulogic_vector(8 downto 0);
 end record hibi_mem_HIBI_DMA_MEM_ADDR2_rw_t;
 constant dflt_hibi_mem_HIBI_DMA_MEM_ADDR2_c : hibi_mem_HIBI_DMA_MEM_ADDR2_rw_t :=(
-  addr => "0000000000"
+  addr => "000000000"
 );
 
 type hibi_mem_HIBI_DMA_MEM_ADDR2_reg2logic_t is record
@@ -421,10 +421,10 @@ constant addr_offset_HIBI_DMA_MEM_ADDR3_slv_c      : std_ulogic_vector(5-1 downt
 constant bit_offset_HIBI_DMA_MEM_ADDR3_addr_c : integer := 0;
 
 type hibi_mem_HIBI_DMA_MEM_ADDR3_rw_t is record
-  addr : std_ulogic_vector(9 downto 0);
+  addr : std_ulogic_vector(8 downto 0);
 end record hibi_mem_HIBI_DMA_MEM_ADDR3_rw_t;
 constant dflt_hibi_mem_HIBI_DMA_MEM_ADDR3_c : hibi_mem_HIBI_DMA_MEM_ADDR3_rw_t :=(
-  addr => "0000000000"
+  addr => "000000000"
 );
 
 type hibi_mem_HIBI_DMA_MEM_ADDR3_reg2logic_t is record
