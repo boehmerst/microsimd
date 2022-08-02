@@ -69667,7 +69667,7 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
    input  wb_reset_i,
    input  en_i,
    input  init_i,
-   input  [31:0] wb_req_i_adr,
+   input  [7:0] wb_req_i_adr,
    input  [31:0] wb_req_i_dat,
    input  wb_req_i_we,
    input  [3:0] wb_req_i_sel,
@@ -69677,7 +69677,7 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
    output [31:0] wb_rsp_o_data,
    output wb_rsp_o_ack,
    output [75:0] gif_req_o);
-  wire [70:0] n4185_o;
+  wire [46:0] n4185_o;
   wire [31:0] n4187_o;
   wire n4188_o;
   wire r;
@@ -69701,10 +69701,10 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
   wire n4226_o;
   wire n4228_o;
   wire n4231_o;
-  wire [30:0] n4233_o;
+  wire [6:0] n4233_o;
   wire [3:0] n4234_o;
   wire [31:0] n4235_o;
-  wire [30:0] n4236_o;
+  wire [6:0] n4236_o;
   wire [3:0] n4237_o;
   wire [31:0] n4238_o;
   wire n4239_o;
@@ -69751,15 +69751,15 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:38:13  */
   assign rin = n4226_o; // (signal)
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:57:40  */
-  assign n4196_o = n4185_o[31];
+  assign n4196_o = n4185_o[7];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:59:10  */
   assign n4199_o = r;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:59:16  */
   assign n4201_o = n4199_o == 1'b0;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:60:19  */
-  assign n4202_o = n4185_o[69];
+  assign n4202_o = n4185_o[45];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:60:42  */
-  assign n4203_o = n4185_o[70];
+  assign n4203_o = n4185_o[46];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:60:29  */
   assign n4204_o = n4202_o & n4203_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:60:7  */
@@ -69789,19 +69789,19 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:59:5  */
   assign n4231_o = n4201_o ? 1'b0 : n4225_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:79:73  */
-  assign n4233_o = n4185_o[30:0];
+  assign n4233_o = n4185_o[6:0];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:79:45  */
   assign n4234_o = n4233_o[3:0];  // trunc
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:80:70  */
-  assign n4235_o = n4185_o[63:32];
+  assign n4235_o = n4185_o[39:8];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:82:73  */
-  assign n4236_o = n4185_o[30:0];
+  assign n4236_o = n4185_o[6:0];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:82:45  */
   assign n4237_o = n4236_o[3:0];  // trunc
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:83:70  */
-  assign n4238_o = n4185_o[63:32];
+  assign n4238_o = n4185_o[39:8];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:85:51  */
-  assign n4239_o = n4185_o[64];
+  assign n4239_o = n4185_o[40];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:85:34  */
   assign n4240_o = n4228_o & n4239_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:85:58  */
@@ -69809,7 +69809,7 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:85:54  */
   assign n4242_o = n4240_o & n4241_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:86:51  */
-  assign n4243_o = n4185_o[64];
+  assign n4243_o = n4185_o[40];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:86:38  */
   assign n4244_o = ~n4243_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:86:34  */
@@ -69819,13 +69819,13 @@ module wb2gif_c4ea21bb365bbeeaf5f2c654883e56d11e43c44e
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:86:54  */
   assign n4247_o = n4245_o & n4246_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:87:51  */
-  assign n4248_o = n4185_o[64];
+  assign n4248_o = n4185_o[40];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:87:34  */
   assign n4249_o = n4228_o & n4248_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:87:54  */
   assign n4250_o = n4249_o & n4196_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:88:51  */
-  assign n4251_o = n4185_o[64];
+  assign n4251_o = n4185_o[40];
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:88:38  */
   assign n4252_o = ~n4251_o;
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/wb2gif.vhd:88:34  */
@@ -76759,7 +76759,7 @@ module hibi_wishbone_bridge_wrapper_3
    input  reset_n_i,
    input  en_i,
    input  init_i,
-   input  [31:0] wb_req_i_adr,
+   input  [7:0] wb_req_i_adr,
    input  [31:0] wb_req_i_dat,
    input  wb_req_i_we,
    input  [3:0] wb_req_i_sel,
@@ -76795,7 +76795,7 @@ module hibi_wishbone_bridge_wrapper_3
    output [4:0] agent_msg_txreq_o_comm,
    output agent_msg_txreq_o_we,
    output agent_msg_rxreq_o_re);
-  wire [70:0] n268_o;
+  wire [46:0] n268_o;
   wire [31:0] n270_o;
   wire n271_o;
   wire n277_o;
@@ -76874,7 +76874,7 @@ module hibi_wishbone_bridge_wrapper_3
   wire [31:0] hostifi0_wb_rsp_o_data;
   wire hostifi0_wb_rsp_o_ack;
   wire [75:0] hostifi0_gif_req_o;
-  wire [31:0] n330_o;
+  wire [7:0] n330_o;
   wire [31:0] n331_o;
   wire n332_o;
   wire [3:0] n333_o;
@@ -77159,12 +77159,12 @@ module hibi_wishbone_bridge_wrapper_3
     .wb_rsp_o_data(hostifi0_wb_rsp_o_data),
     .wb_rsp_o_ack(hostifi0_wb_rsp_o_ack),
     .gif_req_o(hostifi0_gif_req_o));
-  assign n330_o = n268_o[31:0];
-  assign n331_o = n268_o[63:32];
-  assign n332_o = n268_o[64];
-  assign n333_o = n268_o[68:65];
-  assign n334_o = n268_o[69];
-  assign n335_o = n268_o[70];
+  assign n330_o = n268_o[7:0];
+  assign n331_o = n268_o[39:8];
+  assign n332_o = n268_o[40];
+  assign n333_o = n268_o[44:41];
+  assign n334_o = n268_o[45];
+  assign n335_o = n268_o[46];
   assign n336_o = {hostifi0_wb_rsp_o_ack, hostifi0_wb_rsp_o_data};
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/hibi_wishbone_bridge/rtl/hibi_wishbone_bridge_wrapper.vhd:138:40  */
   assign n339_o = host_gif_req[37:0];
@@ -77995,7 +77995,7 @@ module msmp
   `endif
    input  clk_i,
    input  reset_n_i,
-   input  [31:0] host_req_i_adr,
+   input  [7:0] host_req_i_adr,
    input  [31:0] host_req_i_dat,
    input  host_req_i_we,
    input  [3:0] host_req_i_sel,
@@ -78005,7 +78005,7 @@ module msmp
    output [31:0] host_rsp_o_data,
    output host_rsp_o_ack,
    output [37:0] pif_o);
-  wire [70:0] n0_o;
+  wire [46:0] n0_o;
   wire [31:0] n2_o;
   wire n3_o;
   wire [3:0] agent_core_en;
@@ -78074,7 +78074,7 @@ module msmp
   wire host_gen0_hosti0_agent_msg_rxreq_o_re;
   localparam n35_o = 1'b1;
   localparam n36_o = 1'b0;
-  wire [31:0] n37_o;
+  wire [7:0] n37_o;
   wire [31:0] n38_o;
   wire n39_o;
   wire [3:0] n40_o;
@@ -78284,12 +78284,12 @@ module msmp
     .agent_msg_txreq_o_comm(host_gen0_hosti0_agent_msg_txreq_o_comm),
     .agent_msg_txreq_o_we(host_gen0_hosti0_agent_msg_txreq_o_we),
     .agent_msg_rxreq_o_re(host_gen0_hosti0_agent_msg_rxreq_o_re));
-  assign n37_o = n0_o[31:0];
-  assign n38_o = n0_o[63:32];
-  assign n39_o = n0_o[64];
-  assign n40_o = n0_o[68:65];
-  assign n41_o = n0_o[69];
-  assign n42_o = n0_o[70];
+  assign n37_o = n0_o[7:0];
+  assign n38_o = n0_o[39:8];
+  assign n39_o = n0_o[40];
+  assign n40_o = n0_o[44:41];
+  assign n41_o = n0_o[45];
+  assign n42_o = n0_o[46];
   assign n43_o = {host_gen0_hosti0_wb_rsp_o_ack, host_gen0_hosti0_wb_rsp_o_data};
   assign n49_o = {host_gen0_hosti0_agent_txreq_o_we, host_gen0_hosti0_agent_txreq_o_comm, host_gen0_hosti0_agent_txreq_o_data, host_gen0_hosti0_agent_txreq_o_av};
   /* /home/deboehse/VLSI/projects/microsimd/vhdl/microsimd/designs/MPSoC/rtl/msmp.vhd:114:42  */
