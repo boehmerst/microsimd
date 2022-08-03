@@ -16,7 +16,7 @@ use general.general_function_pkg.all;
 
 package wishbone_pkg is
 
-  constant wb_adr_width_c : integer := 2*hibi_wishbone_bridge_addr_width_c;  -- 2*max(hibi_wishbone_bridge_mem_addr_width_c, hibi_wishbone_bridge_addr_width_c);
+  constant wb_adr_width_c : integer := hibi_wishbone_bridge_addr_width_c+1;  -- max(hibi_wishbone_bridge_mem_addr_width_c, hibi_wishbone_bridge_addr_width_c)+1;
   constant wb_dat_width_c : integer := hibi_wishbone_bridge_data_width_c;    -- max(hibi_wishbone_bridge_mem_data_width_c, hibi_wishbone_bridge_data_width_c);
 
     type wb_req_t is record
